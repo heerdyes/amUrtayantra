@@ -562,7 +562,7 @@ void ofApp::modgain(bool mmij, lfo * oo, phasor * ww){
 
 void ofApp::modgain(bool mmij, int arg, phasor * ww){
     if(mmij){
-        ww->modulate(1, ofMap(arg,0,MEMLEN,0.,1.));
+        ww->modulate(1, (float)arg/(float)MEMLEN);
     }
 }
 
@@ -731,9 +731,7 @@ void ofApp::rndrlfos(float x,float y){
         float h1=ofMap(lfo1scope[i],-l1mx,l1mx,-scopeh/2,scopeh/2);
         float h2=ofMap(lfo2scope[i],-l2mx,l2mx,-scopeh/2,scopeh/2);
         ofDrawLine(x+k*i,y+ygap+scopeh/2,x+k*i,y+ygap+scopeh/2+h1);
-//         ofDrawLine(x+i,y+ygap+scopeh/2+h1,x+i,y+ygap+scopeh/2+h1-1);
         ofDrawLine(x+xgap+k*i,y+ygap+scopeh/2,x+xgap+k*i,y+ygap+scopeh/2+h2);
-//         ofDrawLine(x+xgap+i,y+ygap+scopeh/2+h2,x+xgap+i,y+ygap+scopeh/2+h2-1);
     }
 }
 
@@ -806,8 +804,6 @@ void ofApp::f5(float x,float y,int times){
         ofSetColor(0,240,0);
         ofSetLineWidth(1 + (rms * 30.));
         waveform.draw();
-        // modulation  here?
-//         xmod();
         // cycling the vm
         cyclevm();
     }
