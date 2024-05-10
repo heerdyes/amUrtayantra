@@ -8,7 +8,7 @@
 #define MEMLEN 94
 #define NHUES 33
 #define NWAVS 5
-#define NLFOWAVS 1
+#define NLFOWAVS 2
 #define MMROWS 4
 #define MMCOLS 8
 
@@ -46,8 +46,6 @@ public:
 		freqref=f;
 		ampref=g;
 		y = 0;
-		t=0.0;
-		dt=0.005;
 		phase=0.0;
 	}
 
@@ -83,6 +81,54 @@ public:
 	}
 
 	float phase,phasestep;
+};
+
+class lfosqu : public lfo {
+public:
+	lfosqu(float f, float g) {
+		freq = f;
+		amp = g;
+		freqref=f;
+		ampref=g;
+		y = 0;
+		yy=0;
+		phase=0.0;
+	}
+
+	void update(int sr) {
+		phasestep=TWO_PI*freq/sr;
+		phase+=phasestep;
+		yy = sin(phase);
+		y=yy>0?amp:-amp;
+		if(phase>TWO_PI) phase-=TWO_PI;
+	}
+
+	void command(int cc, float cv){
+		switch(cc){
+			case 0:
+				freq=cv;
+				freqref=freq;
+				break;
+			case 1:
+				amp=cv;
+				ampref=amp;
+				break;
+		}
+	}
+
+	void modulate(int mc, float mv){
+		switch(mc){
+			case 0:
+				freq=freqref+mv;
+				break;
+			case 1:
+				amp=ampref+mv;
+				break;
+		}
+	}
+
+	float phase,phasestep;
+	float yy;
 };
 
 // audio phasors
@@ -388,8 +434,8 @@ class ofApp : public ofBaseApp{
 		void initsynth();
 		void rndrmodmat(float x,float y);
 		void rndrlfos(float x,float y);
-		float sanitizegain(bool mmij, lfo * oo);
-		float sanitizegain(bool mmij, int arg);
+		void modgain(bool mmij, lfo * oo, phasor * ww);
+		void modgain(bool mmij, int arg, phasor * ww);
 		void xmod();
 
 		// audio

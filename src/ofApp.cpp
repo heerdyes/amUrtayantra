@@ -52,7 +52,7 @@ void ofApp::cyclevm(){
     char code=M[pc];
     int pos,src,dst,xpc,arg1,arg2,arg3,arg4;
     int ma1,ma2;
-    float hh;
+    float hh,r0;
     switch(code){
         case '.':
             pc=0;
@@ -411,14 +411,17 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case '5': // lfo1 <freq> <gain>
+        case '5': // lfo1 <freq:bichar> <gain:char>
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
             arg2=AB.find(M[pc]);
-            if(arg1!=-1&&arg2!=-1){
-                lfo1[lfo1typ]->command(0,arg1);
-                lfo1[lfo1typ]->command(1,arg2);
+            pc=(pc+1)%MEMLEN;
+            arg3=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1&&arg3!=-1){
+                r0=(float)arg1+ofMap(arg2,0,MEMLEN,0.,1.);
+                lfo1[lfo1typ]->command(0,r0);
+                lfo1[lfo1typ]->command(1,arg3);
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -427,9 +430,12 @@ void ofApp::cyclevm(){
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
             arg2=AB.find(M[pc]);
-            if(arg1!=-1&&arg2!=-1){
-                lfo2[lfo2typ]->command(0,arg1);
-                lfo2[lfo2typ]->command(1,arg2);
+            pc=(pc+1)%MEMLEN;
+            arg3=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1&&arg3!=-1){
+                r0=(float)arg1+ofMap(arg2,0,MEMLEN,0.,1.);
+                lfo2[lfo2typ]->command(0,r0);
+                lfo2[lfo2typ]->command(1,arg3);
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -455,6 +461,7 @@ void ofApp::cyclevm(){
 }
 
 void ofApp::initsynth(){
+    // audio wavs
     w1[0] = new tri(110, 0.4);
 	w2[0] = new tri(111, 0.4);
     w1[1] = new squ(110, 0.4);
@@ -467,9 +474,11 @@ void ofApp::initsynth(){
 	w2[4] = new noyz(110, 0.1);
     w1typ = 0;
     w2typ = 0;
-    // lfo
+    // lfo wavs
     lfo1[0] = new lfosyn(2, 10);
 	lfo2[0] = new lfosyn(2, 10);
+    lfo1[1] = new lfosqu(1, 10);
+	lfo2[1] = new lfosqu(1, 10);
     lfo1typ = 0;
     lfo2typ = 0;
     // init lfo scopes
@@ -545,12 +554,16 @@ float ofApp::idx2freq(int note,float basefreq) {
 }
 
 //--------------------------------------------------------------
-float ofApp::sanitizegain(bool mmij, lfo * oo){
-    return mmij ? ofMap(oo->y,-oo->ampref,oo->ampref,0.,1.) : 1;
+void ofApp::modgain(bool mmij, lfo * oo, phasor * ww){
+    if(mmij){
+        ww->modulate(1, ofMap(oo->y,-oo->ampref,oo->ampref,0.,1.));
+    }
 }
 
-float ofApp::sanitizegain(bool mmij, int arg){
-    return mmij ? ofMap(arg,0,MEMLEN,0.,1.) : 1;
+void ofApp::modgain(bool mmij, int arg, phasor * ww){
+    if(mmij){
+        ww->modulate(1, ofMap(arg,0,MEMLEN,0.,1.));
+    }
 }
 
 void ofApp::xmod(){
@@ -566,9 +579,9 @@ void ofApp::xmod(){
         }else if(mmj==5){
             w2[w2typ]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w2f
         }else if(mmj==6){
-            w1[w1typ]->modulate(1, sanitizegain(modmat[mmi][mmj], lfo1[lfo1typ])); // L1 mod w1g
+            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w1[w1typ]); // L1 mod w1g
         }else if(mmj==7){
-            w2[w2typ]->modulate(1, sanitizegain(modmat[mmi][mmj], lfo1[lfo1typ])); // L1 mod w2g
+            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w2[w2typ]); // L1 mod w2g
         }
     }else if(mmi==1){
         if(mmj==0){
@@ -580,9 +593,9 @@ void ofApp::xmod(){
         }else if(mmj==5){
             w2[w2typ]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w2f
         }else if(mmj==6){
-            w1[w1typ]->modulate(1, sanitizegain(modmat[mmi][mmj], lfo2[lfo2typ])); // L2 mod w1g
+            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w1[w1typ]); // L2 mod w1g
         }else if(mmj==7){
-            w2[w2typ]->modulate(1, sanitizegain(modmat[mmi][mmj], lfo2[lfo2typ])); // L2 mod w2g
+            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w2[w2typ]); // L2 mod w2g
         }
     }else if(mmi==2){
         if(mmj==0){
@@ -598,9 +611,9 @@ void ofApp::xmod(){
         }else if(mmj==5){
             w2[w2typ]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w2f
         }else if(mmj==6){
-            w1[w1typ]->modulate(1, sanitizegain(modmat[mmi][mmj], activenote)); // nn mod w1g
+            modgain(modmat[mmi][mmj], activenote, w1[w1typ]); // nn mod w1g
         }else if(mmj==7){
-            w2[w2typ]->modulate(1, sanitizegain(modmat[mmi][mmj], activenote)); // nn mod w2g
+            modgain(modmat[mmi][mmj], activenote, w2[w2typ]); // nn mod w2g
         }
     }else if(mmi==3){
         if(mmj==0){
@@ -616,9 +629,9 @@ void ofApp::xmod(){
         }else if(mmj==5){
             w2[w2typ]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w2f
         }else if(mmj==6){
-            w1[w1typ]->modulate(1, sanitizegain(modmat[mmi][mmj], notevelo)); // nv mod w1g
+            modgain(modmat[mmi][mmj], notevelo, w1[w1typ]); // nv mod w1g
         }else if(mmj==7){
-            w2[w2typ]->modulate(1, sanitizegain(modmat[mmi][mmj], notevelo)); // nv mod w2g
+            modgain(modmat[mmi][mmj], notevelo, w2[w2typ]); // nv mod w2g
         }
     }
     mmctr=(mmctr+1)%(MMROWS*MMCOLS);
@@ -701,9 +714,13 @@ void ofApp::rndrlfos(float x,float y){
     fnt.drawString("--- LFO1 ---",x,y);
     sprintf(q,"f=%05.2f, g=%.2f",lfo1[lfo1typ]->freq,lfo1[lfo1typ]->amp);
     fnt.drawString(q,x,y+ch);
+    sprintf(q,"          -%.2f",lfo1[lfo1typ]->amp);
+    fnt.drawString(q,x,y+ch+scopeh+ygap);
     fnt.drawString("--- LFO2 ---",x+xgap,y);
     sprintf(q,"f=%05.2f, g=%.2f",lfo2[lfo2typ]->freq,lfo2[lfo2typ]->amp);
     fnt.drawString(q,x+xgap,y+ch);
+    sprintf(q,"          -%.2f",lfo2[lfo2typ]->amp);
+    fnt.drawString(q,x+xgap,y+ch+scopeh+ygap);
 
     // scopes
     ofSetColor(23*0.66,202*0.66,232*0.66);
