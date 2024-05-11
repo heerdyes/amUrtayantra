@@ -38,7 +38,7 @@ void ofApp::initvm(){
     lcjmp=10;
     lcdown=0;
     vmx=30.;
-    vmy=40.;
+    vmy=55.;
 }
 
 void ofApp::color12(int c){
@@ -482,7 +482,7 @@ void ofApp::initsynth(){
     lfo1typ = 0;
     lfo2typ = 0;
     // init lfo scopes
-    lfobufsz=84;
+    lfobufsz=100;
     lfoctr=0;
     for(int i=0;i<lfobufsz;i++){
         lfo1scope.push_back(0.);
@@ -515,7 +515,7 @@ void ofApp::setup(){
     initvm();
     initsynth();
 
-    fnt.load("OCRA",10,true,true);
+    fnt.load("OCRA",14,true,true);
 }
 
 //--------------------------------------------------------------
@@ -670,24 +670,24 @@ void ofApp::rndrmem(float y){
     ofSetColor(0,230,0);
     char q[2];
     float d=6;
-    float cw=16,ch=18;
+    float cw=18.,ch=20.;
     vmx=(ofGetWidth()-MEMLEN*cw)/2.;
     float x=vmx;
     for(int i=0;i<MEMLEN;i++){
         if(ec==i){
-            ofSetColor(180,120,0);
+            ofSetColor(240,160,0);
             ofDrawLine(x+i*cw,y+ch,x+i*cw+d,y+ch-d);
             ofDrawLine(x+i*cw+d,y+ch-d,x+i*cw+2*d,y+ch);
         }
         if(pc==i){
-            ofSetColor(0,120,120);
+            ofSetColor(0,220,220);
             ofDrawLine(x+i*cw,y-ch-2,x+i*cw+d,y-ch-2+d);
             ofDrawLine(x+i*cw+d,y-ch-2+d,x+i*cw+2*d,y-ch-2);
         }
         ofSetColor(0,240,0);
         sprintf(q,"%c",M[i]);
         fnt.drawString(q,x+i*cw,y+3);
-        ofSetColor(70,70,70);
+        ofSetColor(144,144,144);
         sprintf(q,"%c",AB[i]);
         fnt.drawString(q,x+i*cw,y+3+ch+12);
     }
@@ -708,7 +708,7 @@ void ofApp::rndrlfos(float x,float y){
     char q[32];
     float xgap=256.;
     float ch=18.;
-    float scopeh=64.,ygap=27.;
+    float scopeh=84.,ygap=27.;
 
     // log it
     fnt.drawString("--- LFO1 ---",x,y);
@@ -723,10 +723,10 @@ void ofApp::rndrlfos(float x,float y){
     fnt.drawString(q,x+xgap,y+ch+scopeh+ygap);
 
     // scopes
-    ofSetColor(23*0.66,202*0.66,232*0.66);
+    ofSetColor(23,202,232);
     float l1mx=lfo1[lfo1typ]->ampref;
     float l2mx=lfo2[lfo2typ]->ampref;
-    float k=2.0;
+    float k=2;
     for(int i=0;i<lfobufsz;i++){
         float h1=ofMap(lfo1scope[i],-l1mx,l1mx,-scopeh/2,scopeh/2);
         float h2=ofMap(lfo2scope[i],-l2mx,l2mx,-scopeh/2,scopeh/2);
@@ -737,7 +737,7 @@ void ofApp::rndrlfos(float x,float y){
 
 void ofApp::rndrmodmat(float x,float y){
     ofSetColor(23,202,232);
-    float cw=16,ch=18;
+    float cw=22,ch=24;
     char q[2];
     fnt.drawString("src",x,y+ch);
     fnt.drawString("dst",x+cw,y);
@@ -799,8 +799,8 @@ void ofApp::f5(float x,float y,int times){
         // rndr
         rndryc(ofGetHeight()-200-30);
         rndrmem(y);
-        rndrmodmat(35,110);
-        rndrlfos(440,110);
+        rndrmodmat(ofGetWidth()/5,144);
+        rndrlfos(ofGetWidth()/2,144);
         ofSetColor(0,240,0);
         ofSetLineWidth(1 + (rms * 30.));
         waveform.draw();
