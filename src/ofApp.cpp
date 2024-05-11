@@ -816,7 +816,6 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-    cout<<key<<endl;
     int tmp;
     if(key==1)    return;
     if(key==2)    return;
