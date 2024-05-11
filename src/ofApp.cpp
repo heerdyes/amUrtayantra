@@ -892,6 +892,11 @@ void ofApp::keyPressed(int key){
         }
         ec=0;
         pc=0;
+        for(int i=0;i<MMROWS;i++){ // !clear modmatrix!
+            for(int j=0;j<MMCOLS;j++){
+                modmat[i][j]=0;
+            }
+        }
         return;
     }
     M[ec]=key;
