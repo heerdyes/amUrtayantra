@@ -9,6 +9,7 @@
 #define NHUES 33
 #define NWAVS 5
 #define NLFOWAVS 2
+#define NOSCS 4
 #define MMROWS 4
 #define MMCOLS 8
 
@@ -446,18 +447,18 @@ class ofApp : public ofBaseApp{
 		float rms;
 
 		// synth
-		phasor * w1[NWAVS];
-		phasor * w2[NWAVS];
+		phasor * w[NOSCS][NWAVS];
 		lfo * lfo1[NLFOWAVS];
 		lfo * lfo2[NLFOWAVS];
 		vector<float> lfo1scope;
 		vector<float> lfo2scope;
 		int lfobufsz;
 		int lfoctr;
-		int w1typ,w2typ,lfo1typ,lfo2typ;
-		float rootf1,rootf2;
+		int wtyp[NOSCS];
+		int lfo1typ,lfo2typ;
+		float rootf[NOSCS];
 		float rootflo,rootfhi;
-		float gain1,gain2;
+		float gain[NOSCS];
 		float gainhi,gainlo;
 		float mgain;
 		float mglo,mghi;
@@ -485,9 +486,9 @@ class ofApp : public ofBaseApp{
 		// vm
 		char M[MEMLEN];
 		// programs (patches)
-		string p0="i0j0m~n0g0c91c931s2r3242p0q0c7pc7r...............................................................";
-		string p1="i0j0m~n0g0c91c931s2s3242x04153fdp0q0c7xc7z.......................................................";
-		string p2="i0j0m~n0g0raZap0q0cdfcdh1s2u3141.................................................................";
+		string p0="I0n0g0c51P0c3a 10p11q12r13s fa.................................................................";
+		string p1="I0nog0c51Poc3a 10p11p12q13q fam\\ ~2...........................................................";
+		string p2="I0nog0c51Poc3a 10p11p12q13q fam\\ ~2...........................................................";
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
 		int pc;

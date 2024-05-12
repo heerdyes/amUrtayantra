@@ -111,19 +111,23 @@ void ofApp::cyclevm(){
                 M[xpc]=AB[arg2-1];
             }
             break;
-        case '1':
+        case '1': // oscillator tuning
             pc=(pc+1)%MEMLEN;
-            pos=AB.find(M[pc]);
-            if(pos!=-1){
-                rootf1=ofMap(pos,0,MEMLEN-1,rootflo,rootfhi);
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                rootf[arg1%NOSCS]=ofMap(arg2,0,MEMLEN-1,rootflo,rootfhi);
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case '2':
+        case '!': // tuning all oscs at once
             pc=(pc+1)%MEMLEN;
-            pos=AB.find(M[pc]);
-            if(pos!=-1){
-                rootf2=ofMap(pos,0,MEMLEN-1,rootflo,rootfhi);
+            arg1=AB.find(M[pc]);
+            if(arg1!=-1){
+                for(int i=0;i<NOSCS;i++){
+                    rootf[i]=ofMap(arg1,0,MEMLEN-1,rootflo,rootfhi);
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -244,19 +248,23 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'i':
+        case 'i': // per oscillator gain
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                gain1=ofMap(arg1,0,MEMLEN-1,gainlo,gainhi);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                gain[arg1%NOSCS]=ofMap(arg2,0,MEMLEN-1,gainlo,gainhi);
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'j':
+        case 'I': // all oscillators gain
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
-                gain2=ofMap(arg1,0,MEMLEN-1,gainlo,gainhi);
+                for(int i=0;i<NOSCS;i++){
+                    gain[i]=ofMap(arg1,0,MEMLEN-1,gainlo,gainhi/NOSCS);
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -279,35 +287,44 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'p':
+        case 'p': // per osc note: p <oscnum> <notenum>
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                w1[w1typ]->command(0,idx2freq(arg1,rootf1));
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                ma1=arg1%NOSCS;
+                w[ma1][wtyp[ma1]]->command(0,idx2freq(arg2,rootf[ma1]));
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'q':
+        case 'P': // each osc note: P <notenum>
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
-                w2[w2typ]->command(0,idx2freq(arg1,rootf2));
+                for(int i=0;i<NOSCS;i++){
+                    w[i][wtyp[i]]->command(0,idx2freq(arg1,rootf[i]));
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case '3':
+        case '`': // per osc wave type: ` <oscnum> <osctyp>
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                w1typ=arg1%NWAVS;
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                wtyp[arg1%NOSCS]=arg2%NWAVS;
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case '4':
+        case '~': // every osc wave type: ~ <osctyp>
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
-                w2typ=arg1%NWAVS;
+                for(int i=0;i<NOSCS;i++){
+                    wtyp[i]=arg1%NWAVS;
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -461,19 +478,17 @@ void ofApp::cyclevm(){
 }
 
 void ofApp::initsynth(){
-    // audio wavs
-    w1[0] = new tri(110, 0.4);
-	w2[0] = new tri(111, 0.4);
-    w1[1] = new squ(110, 0.4);
-	w2[1] = new squ(111, 0.4);
-    w1[2] = new rsaw(110, 0.4);
-	w2[2] = new rsaw(111, 0.4);
-    w1[3] = new syn(110, 0.4);
-	w2[3] = new syn(111, 0.4);
-    w1[4] = new noyz(110, 0.1);
-	w2[4] = new noyz(110, 0.1);
-    w1typ = 0;
-    w2typ = 0;
+    // audio wavs (now multiple oscillators)
+    for(int i=0;i<NOSCS;i++){
+        w[i][0]=new tri(110,0.4);
+        w[i][1]=new squ(110,0.4);
+        w[i][2]=new rsaw(110,0.4);
+        w[i][3]=new syn(110,0.4);
+        w[i][4]=new noyz(110,0.4);
+        wtyp[i]=0;
+        rootf[i]=52.0;
+        gain[i]=1./NOSCS;
+    }
     // lfo wavs
     lfo1[0] = new lfosyn(2, 10);
 	lfo2[0] = new lfosyn(2, 10);
@@ -489,8 +504,6 @@ void ofApp::initsynth(){
         lfo2scope.push_back(0.);
     }
     //
-    rootf1 = 52.0;
-    rootf2 = 52.0;
     rootflo=40.0;
     rootfhi=80.0;
     activenote=0;
@@ -498,11 +511,9 @@ void ofApp::initsynth(){
     // osc gains
     gainhi=0.95;
     gainlo=0.00;
-    gain1=0.4;
-    gain2=0.4;
     mgain=0.0;
     mglo=0.00;
-    mghi=0.20;
+    mghi=0.75;
 }
 
 void ofApp::setup(){
@@ -566,6 +577,8 @@ void ofApp::modgain(bool mmij, int arg, phasor * ww){
     }
 }
 
+// this needs massive changes after multi-oscillator implementation
+// for now hard-coding w1, w2 -> w[0], w[1]
 void ofApp::xmod(){
     int mmi=mmctr/MMCOLS;
     int mmj=mmctr%MMCOLS;
@@ -575,13 +588,13 @@ void ofApp::xmod(){
         }else if(mmj==3){
             lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod L2g
         }else if(mmj==4){
-            w1[w1typ]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w1f
+            w[0][wtyp[0]]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w1f
         }else if(mmj==5){
-            w2[w2typ]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w2f
+            w[1][wtyp[1]]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w2f
         }else if(mmj==6){
-            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w1[w1typ]); // L1 mod w1g
+            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w[0][wtyp[0]]); // L1 mod w1g
         }else if(mmj==7){
-            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w2[w2typ]); // L1 mod w2g
+            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w[1][wtyp[1]]); // L1 mod w2g
         }
     }else if(mmi==1){
         if(mmj==0){
@@ -589,13 +602,13 @@ void ofApp::xmod(){
         }else if(mmj==2){
             lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod L1g
         }else if(mmj==4){
-            w1[w1typ]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w1f
+            w[0][wtyp[0]]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w1f
         }else if(mmj==5){
-            w2[w2typ]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w2f
+            w[1][wtyp[1]]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w2f
         }else if(mmj==6){
-            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w1[w1typ]); // L2 mod w1g
+            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w[0][wtyp[0]]); // L2 mod w1g
         }else if(mmj==7){
-            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w2[w2typ]); // L2 mod w2g
+            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w[1][wtyp[1]]); // L2 mod w2g
         }
     }else if(mmi==2){
         if(mmj==0){
@@ -607,13 +620,13 @@ void ofApp::xmod(){
         }else if(mmj==3){
             lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? activenote : 0); // nn mod L2g
         }else if(mmj==4){
-            w1[w1typ]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w1f
+            w[0][wtyp[0]]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w1f
         }else if(mmj==5){
-            w2[w2typ]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w2f
+            w[1][wtyp[1]]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w2f
         }else if(mmj==6){
-            modgain(modmat[mmi][mmj], activenote, w1[w1typ]); // nn mod w1g
+            modgain(modmat[mmi][mmj], activenote, w[0][wtyp[0]]); // nn mod w1g
         }else if(mmj==7){
-            modgain(modmat[mmi][mmj], activenote, w2[w2typ]); // nn mod w2g
+            modgain(modmat[mmi][mmj], activenote, w[1][wtyp[1]]); // nn mod w2g
         }
     }else if(mmi==3){
         if(mmj==0){
@@ -625,13 +638,13 @@ void ofApp::xmod(){
         }else if(mmj==3){
             lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? notevelo : 0); // nv mod L2g
         }else if(mmj==4){
-            w1[w1typ]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w1f
+            w[0][wtyp[0]]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w1f
         }else if(mmj==5){
-            w2[w2typ]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w2f
+            w[1][wtyp[1]]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w2f
         }else if(mmj==6){
-            modgain(modmat[mmi][mmj], notevelo, w1[w1typ]); // nv mod w1g
+            modgain(modmat[mmi][mmj], notevelo, w[0][wtyp[0]]); // nv mod w1g
         }else if(mmj==7){
-            modgain(modmat[mmi][mmj], notevelo, w2[w2typ]); // nv mod w2g
+            modgain(modmat[mmi][mmj], notevelo, w[1][wtyp[1]]); // nv mod w2g
         }
     }
     mmctr=(mmctr+1)%(MMROWS*MMCOLS);
@@ -641,19 +654,21 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
 	int sr = outBuffer.getSampleRate();
 	for(size_t i = 0; i < outBuffer.getNumFrames(); i++) {
 		// waveshaping
-		float d = gain1 * w1[w1typ]->y;
-		float e = gain2 * w2[w2typ]->y;
-		float outl = mgain * d;
-        float outr = mgain * e;
+        float mix=0.;
+        for(int i=0;i<NOSCS;i++){
+            mix += gain[i] * w[i][wtyp[i]]->y;
+        }
+		float lmono = mgain * mix; // for now L/MONO
 		// write out
-		outBuffer.getSample(i, 0) = outl+outr;
-		outBuffer.getSample(i, 1) = outl+outr;
+		outBuffer.getSample(i, 0) = lmono;
+		outBuffer.getSample(i, 1) = lmono;
         // modulation
         xmod(); // here or in draw?
 		// updation
-		w1[w1typ]->update(sr);
-		w2[w2typ]->update(sr);
-        lfo1[lfo1typ]->update(sr);
+        for(int i=0;i<NOSCS;i++){
+            w[i][wtyp[i]]->update(sr);
+        }
+		lfo1[lfo1typ]->update(sr);
         lfo2[lfo2typ]->update(sr);
 	}
 
@@ -874,7 +889,13 @@ void ofApp::keyPressed(int key){
         return;
     }
     if(key==3685) return; // ralt
-    if(key==13)   return; // enter
+    if(key==13){ // enter: dump the tape
+        for(int i=0;i<MEMLEN;i++){
+            cout<<M[i];
+        }
+        cout<<endl;
+        return;
+    }
     if(key==57356){ // larrow
         if(lcdown){
             tmp=ec-lcjmp;
