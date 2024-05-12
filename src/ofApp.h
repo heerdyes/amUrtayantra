@@ -208,13 +208,11 @@ public:
 	}
 
 	void update(int sr) {
-		phasestep = 2.0 * freq / sr;
-		y_ += phasestep;
-		if (y_ > 0.4999) {
-			yy = -yy;
-			y_=0.;
-		}
-		y=yy*gain;
+		phasestep=TWO_PI*freq/sr;
+		phase+=phasestep;
+		yy=sin(phase);
+		y=yy>0?gain:-gain;
+		if(phase>TWO_PI) phase-=TWO_PI;
 	}
 
 	void command(int cc, float cv){
@@ -437,6 +435,8 @@ class ofApp : public ofBaseApp{
 		void modgain(bool mmij, lfo * oo, phasor * ww);
 		void modgain(bool mmij, int arg, phasor * ww);
 		void xmod();
+		void clrmodmat();
+		void loadprogram(int pid);
 
 		// audio
 		std::mutex audioMutex;
@@ -484,6 +484,11 @@ class ofApp : public ofBaseApp{
 
 		// vm
 		char M[MEMLEN];
+		// programs (patches)
+		string p0="i0j0m~n0g0c91c931s2r3242p0q0c7pc7r...............................................................";
+		string p1="i0j0m~n0g0c91c931s2s3242x04153fdp0q0c7xc7z.......................................................";
+		string p2="i0j0m~n0g0raZap0q0cdfcdh1s2u3141.................................................................";
+		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
 		int pc;
 		int ec;
@@ -495,6 +500,7 @@ class ofApp : public ofBaseApp{
 		int lcdown;
 		int lcjmp;
 		int lsdown;
+		bool ladown; // left alt down
 
 		// gui
 		float vmx,vmy;

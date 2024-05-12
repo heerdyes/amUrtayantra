@@ -809,6 +809,44 @@ void ofApp::f5(float x,float y,int times){
     }
 }
 
+void ofApp::clrmodmat(){
+    for(int i=0;i<MMROWS;i++){ // !clear modmatrix!
+        for(int j=0;j<MMCOLS;j++){
+            modmat[i][j]=0;
+        }
+    }
+}
+
+void ofApp::loadprogram(int pid){
+    if(pid==0){
+        clrmodmat();
+        for(int i=0;i<MEMLEN;i++){
+            M[i]=p0[i];
+        }
+        ec=0;
+        pc=0;
+        return;
+    }
+    if(pid==1){
+        clrmodmat();
+        for(int i=0;i<MEMLEN;i++){
+            M[i]=p1[i];
+        }
+        ec=0;
+        pc=0;
+        return;
+    }
+    if(pid==2){
+        clrmodmat();
+        for(int i=0;i<MEMLEN;i++){
+            M[i]=p2[i];
+        }
+        ec=0;
+        pc=0;
+        return;
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::draw(){
     f5(vmx,vmy,f5times);
@@ -817,6 +855,7 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     int tmp;
+    cout<<key<<endl;
     if(key==1)    return;
     if(key==2)    return;
     if(key==4)    return;
@@ -830,7 +869,10 @@ void ofApp::keyPressed(int key){
         return;
     }
     if(key==3683) return; // rctrl
-    if(key==3684) return; // lalt
+    if(key==3684) { // lalt
+        ladown=1;
+        return;
+    }
     if(key==3685) return; // ralt
     if(key==13)   return; // enter
     if(key==57356){ // larrow
@@ -886,16 +928,25 @@ void ofApp::keyPressed(int key){
         return;
     }
     if(key==127){ // !clear tape!
+        clrmodmat();
         for(int i=0;i<MEMLEN;i++){
             M[i]='.';
         }
         ec=0;
         pc=0;
-        for(int i=0;i<MMROWS;i++){ // !clear modmatrix!
-            for(int j=0;j<MMCOLS;j++){
-                modmat[i][j]=0;
-            }
-        }
+        return;
+    }
+    // program (patch) memory
+    if(key==48&&ladown){ // load program 0
+        loadprogram(0);
+        return;
+    }
+    if(key==49&&ladown){
+        loadprogram(1);
+        return;
+    }
+    if(key==50&&ladown){
+        loadprogram(2);
         return;
     }
     M[ec]=key;
@@ -910,6 +961,10 @@ void ofApp::keyReleased(int key){
     }
     if(key==3680){ // lshift
         lsdown=0;
+        return;
+    }
+    if(key==3684){ // lalt
+        ladown=0;
         return;
     }
 }
