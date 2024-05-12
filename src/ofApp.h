@@ -482,6 +482,8 @@ class ofApp : public ofBaseApp{
 
 		// vm
 		char M[MEMLEN];
+		// programs (patches)
+		string p0="i0j0m~n0g0c91c931s2r3242.........................................................................";
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
 		int pc;
 		int ec;
