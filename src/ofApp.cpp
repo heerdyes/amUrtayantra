@@ -75,6 +75,34 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
+        case '>': // ++ if M[arg1] multiple of arg2: > 'addr' 'num' '_'
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg3=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1&&arg2!=0&&arg3!=-1){
+                if(AB.find(M[arg1])%arg2==0){
+                    M[pc]=AB[(arg3+1)%MEMLEN];
+                }
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
+        case '<': // ++ if M[arg1] multiple of arg2: > 'addr' 'num' '_'
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg3=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1&&arg2!=0&&arg3!=-1){
+                if(AB.find(M[arg1])%arg2==0){
+                    M[pc]=AB[arg3==0?(MEMLEN-1):(arg3-1)];
+                }
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
         case 'A': // ramp up till limit
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
@@ -833,33 +861,17 @@ void ofApp::clrmodmat(){
 }
 
 void ofApp::loadprogram(int pid){
-    if(pid==0){
-        clrmodmat();
-        for(int i=0;i<MEMLEN;i++){
-            M[i]=p0[i];
-        }
-        ec=0;
-        pc=0;
+    if(pid<0){
+        cout<<"program #"<<pid<<" unavailable!\n";
         return;
     }
-    if(pid==1){
-        clrmodmat();
-        for(int i=0;i<MEMLEN;i++){
-            M[i]=p1[i];
-        }
-        ec=0;
-        pc=0;
-        return;
+    clrmodmat();
+    for(int i=0;i<MEMLEN;i++){
+        M[i]=prgms[pid%NPRGMS][i];
     }
-    if(pid==2){
-        clrmodmat();
-        for(int i=0;i<MEMLEN;i++){
-            M[i]=p2[i];
-        }
-        ec=0;
-        pc=0;
-        return;
-    }
+    ec=0;
+    pc=0;
+    return;
 }
 
 //--------------------------------------------------------------
@@ -957,17 +969,9 @@ void ofApp::keyPressed(int key){
         pc=0;
         return;
     }
-    // program (patch) memory
-    if(key==48&&ladown){ // load program 0
-        loadprogram(0);
-        return;
-    }
-    if(key==49&&ladown){
-        loadprogram(1);
-        return;
-    }
-    if(key==50&&ladown){
-        loadprogram(2);
+    // program (patch) memory [0-9] check prgms str arr
+    if(key>=48&&key<=57&&ladown){
+        loadprogram(key-48);
         return;
     }
     M[ec]=key;

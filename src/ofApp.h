@@ -12,6 +12,7 @@
 #define NOSCS 4
 #define MMROWS 4
 #define MMCOLS 8
+#define NPRGMS 3
 
 class phasor{
 public:
@@ -486,9 +487,11 @@ class ofApp : public ofBaseApp{
 		// vm
 		char M[MEMLEN];
 		// programs (patches)
-		string p0="I0n0g0c51P0c3a 10p11q12r13s fa.................................................................";
-		string p1="I0nog0c51Poc3a 10p11p12q13q fam\\ ~2...........................................................";
-		string p2="I0nog0c51Poc3a 10p11p12q13q fam\\ ~2...........................................................";
+		string prgms[NPRGMS]={
+			"I0n0g0c51P0c3a 10p11q12r13s fa.................................................................",
+			"I0nog0c51Poc3a 10p11p12q13q fam\\ ~2...........................................................",
+			"mAI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2..................................."
+		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
 		int pc;
@@ -496,6 +499,9 @@ class ofApp : public ofBaseApp{
 		ofTrueTypeFont fnt;
 		int f5times;
 		int cablehues[NHUES]={0x00f,0x0f0,0xf00, 0x01e,0x1e0,0x10e, 0x02d,0x2d0,0x20d, 0x03c,0x3c0,0x30c, 0x04b,0x4b0,0x40b, 0x05a,0x5a0,0x50a,0x069,0x690,0x609, 0x078,0x780,0x708, 0x087,0x870,0x807, 0x096,0x960,0x906, 0x0a5,0xa50,0xa05};
+
+		// "mAI0n[g0c73P[c5c10m11\12y13Fvmcti#t4\ c,l#t8y c=o#tcF c$r~2..................................."
+		//  0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:"{}_+|~
 
 		// key gestures
 		int lcdown;
