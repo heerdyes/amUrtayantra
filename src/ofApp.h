@@ -208,13 +208,11 @@ public:
 	}
 
 	void update(int sr) {
-		phasestep = 2.0 * freq / sr;
-		y_ += phasestep;
-		if (y_ > 0.4999) {
-			yy = -yy;
-			y_=0.;
-		}
-		y=yy*gain;
+		phasestep=TWO_PI*freq/sr;
+		phase+=phasestep;
+		yy=sin(phase);
+		y=yy>0?gain:-gain;
+		if(phase>TWO_PI) phase-=TWO_PI;
 	}
 
 	void command(int cc, float cv){
