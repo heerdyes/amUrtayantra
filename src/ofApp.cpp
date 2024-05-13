@@ -615,28 +615,20 @@ void ofApp::xmod(){
             lfo2[lfo2typ]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod L2f
         }else if(mmj==3){
             lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod L2g
-        }else if(mmj==4){
-            w[0][wtyp[0]]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w1f
-        }else if(mmj==5){
-            w[1][wtyp[1]]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w2f
-        }else if(mmj==6){
-            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w[0][wtyp[0]]); // L1 mod w1g
-        }else if(mmj==7){
-            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w[1][wtyp[1]]); // L1 mod w2g
+        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
+            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w[0-8]f
+        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
+            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w[mmj-13][wtyp[mmj-13]]); // L1 mod w[0-8]g
         }
     }else if(mmi==1){
         if(mmj==0){
             lfo1[lfo1typ]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod L1f
         }else if(mmj==2){
             lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod L1g
-        }else if(mmj==4){
-            w[0][wtyp[0]]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w1f
-        }else if(mmj==5){
-            w[1][wtyp[1]]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w2f
-        }else if(mmj==6){
-            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w[0][wtyp[0]]); // L2 mod w1g
-        }else if(mmj==7){
-            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w[1][wtyp[1]]); // L2 mod w2g
+        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
+            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w[0-8]f
+        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
+            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w[mmj-13][wtyp[mmj-13]]); // L2 mod w[0-8]g
         }
     }else if(mmi==2){
         if(mmj==0){
@@ -647,14 +639,10 @@ void ofApp::xmod(){
             lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? activenote : 0); // nn mod L1g
         }else if(mmj==3){
             lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? activenote : 0); // nn mod L2g
-        }else if(mmj==4){
-            w[0][wtyp[0]]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w1f
-        }else if(mmj==5){
-            w[1][wtyp[1]]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w2f
-        }else if(mmj==6){
-            modgain(modmat[mmi][mmj], activenote, w[0][wtyp[0]]); // nn mod w1g
-        }else if(mmj==7){
-            modgain(modmat[mmi][mmj], activenote, w[1][wtyp[1]]); // nn mod w2g
+        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
+            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w[0-8]f
+        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
+            modgain(modmat[mmi][mmj], activenote, w[mmj-13][wtyp[mmj-13]]); // nn mod w[0-8]g
         }
     }else if(mmi==3){
         if(mmj==0){
@@ -665,14 +653,10 @@ void ofApp::xmod(){
             lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? notevelo : 0); // nv mod L1g
         }else if(mmj==3){
             lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? notevelo : 0); // nv mod L2g
-        }else if(mmj==4){
-            w[0][wtyp[0]]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w1f
-        }else if(mmj==5){
-            w[1][wtyp[1]]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w2f
-        }else if(mmj==6){
-            modgain(modmat[mmi][mmj], notevelo, w[0][wtyp[0]]); // nv mod w1g
-        }else if(mmj==7){
-            modgain(modmat[mmi][mmj], notevelo, w[1][wtyp[1]]); // nv mod w2g
+        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
+            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w[0-8]f
+        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
+            modgain(modmat[mmi][mmj], notevelo, w[mmj-13][wtyp[mmj-13]]); // nv mod w[0-8]g
         }
     }
     mmctr=(mmctr+1)%(MMROWS*MMCOLS);
@@ -691,7 +675,7 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
 		outBuffer.getSample(i, 0) = lmono;
 		outBuffer.getSample(i, 1) = lmono;
         // modulation
-        xmod(); // here or in draw?
+        xmod();
 		// updation
         for(int i=0;i<NOSCS;i++){
             w[i][wtyp[i]]->update(sr);
@@ -782,15 +766,21 @@ void ofApp::rndrmodmat(float x,float y){
     ofSetColor(23,202,232);
     float cw=22,ch=24;
     char q[2];
+    char s[3];
     fnt.drawString("src",x,y+ch);
     fnt.drawString("dst",x+cw,y);
     ofDrawLine(x,y,x+cw*3,y+ch*1);
+    ofFill();
     for(int i=0;i<MMROWS;i++){
         for(int j=0;j<MMCOLS;j++){
-            sprintf(q,"%d",modmat[i][j]);
-            fnt.drawString(q,x+(j+2)*cw*2,y+(i+2)*ch);
+//             sprintf(q,"%d",modmat[i][j]);
+//             fnt.drawString(q,x+(j+2)*cw*2,y+(i+2)*ch);
+            if(modmat[i][j]){
+                ofDrawRectangle(x-5+(j+2)*cw*2,y+5+(i+1)*ch,cw,ch);
+            }
         }
     }
+    ofNoFill();
     // row desc
     fnt.drawString("L1 0",x,y+ch*2);
     fnt.drawString("L2 1",x,y+ch*3);
@@ -798,24 +788,20 @@ void ofApp::rndrmodmat(float x,float y){
     fnt.drawString("NV 3",x,y+ch*5);
     ofDrawLine(x+cw*3,y+ch,x+cw*3,y+ch*5+5);
     // col desc
-    fnt.drawString("0",x+cw*4,y+ch);
-    fnt.drawString("1",x+cw*6,y+ch);
-    fnt.drawString("2",x+cw*8,y+ch);
-    fnt.drawString("3",x+cw*10,y+ch);
-    fnt.drawString("4",x+cw*12,y+ch);
-    fnt.drawString("5",x+cw*14,y+ch);
-    fnt.drawString("6",x+cw*16,y+ch);
-    fnt.drawString("7",x+cw*18,y+ch);
+    for(int i=0;i<MMCOLS;i++){
+        sprintf(s,"%c",AB[i]);
+        fnt.drawString(s,x+cw*(4+i*2),y+ch);
+    }
     //
     fnt.drawString("L1f",x+cw*4,y);
     fnt.drawString("L2f",x+cw*6,y);
     fnt.drawString("L1g",x+cw*8,y);
     fnt.drawString("L2g",x+cw*10,y);
-    fnt.drawString("w1f",x+cw*12,y);
-    fnt.drawString("w2f",x+cw*14,y);
-    fnt.drawString("w1g",x+cw*16,y);
-    fnt.drawString("w2g",x+cw*18,y);
-    ofDrawLine(x+cw*3,y+ch+3,x+cw*19,y+ch+3);
+    ofDrawLine(x+cw*12,y+4,x+cw*29,y+4);
+    fnt.drawString("w[0-8]f",x+cw*18,y);
+    ofDrawLine(x+cw*30,y+4,x+cw*47,y+4);
+    fnt.drawString("w[0-8]g",x+cw*36,y);
+    ofDrawLine(x+cw*3,y+ch+3,x+cw*(5+(MMCOLS-1)*2),y+ch+3);
 }
 
 void ofApp::kbsweep(){
@@ -842,8 +828,8 @@ void ofApp::f5(float x,float y,int times){
         // rndr
         rndryc(ofGetHeight()-200-30);
         rndrmem(y);
-        rndrmodmat(ofGetWidth()/5,144);
-        rndrlfos(ofGetWidth()/2,144);
+        rndrmodmat(112,144);
+        rndrlfos(ofGetWidth()*0.66,144);
         ofSetColor(0,240,0);
         ofSetLineWidth(1 + (rms * 30.));
         waveform.draw();

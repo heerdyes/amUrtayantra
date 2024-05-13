@@ -9,10 +9,10 @@
 #define NHUES 33
 #define NWAVS 5
 #define NLFOWAVS 2
-#define NOSCS 4
+#define NOSCS 9
 #define MMROWS 4
-#define MMCOLS 8
-#define NPRGMS 3
+#define MMCOLS 22
+#define NPRGMS 4
 
 class phasor{
 public:
@@ -467,12 +467,13 @@ class ofApp : public ofBaseApp{
 		// TODO: make this configurable later
 		float tuning[12] = {1.0, 17.0/16.0, 9.0/8.0, 19.0/16.0, 5.0/4.0, 4.0/3.0, 17.0/12.0, 3.0/2.0, 19.0/12.0, 5.0/3.0, 85.0/48.0, 15.0/8.0};
 		bool modmat[MMROWS][MMCOLS] = {
-			// L1f, L2f, L1g, L2g, w1f, w2f, w1g, w2g
-			{    0,   0,   0,   0,   0,   0,   0,   0    }, // L1, [0] [2] -> X
-			{    0,   0,   0,   0,   0,   0,   0,   0    }, // L2, [1] [3] -> X
-			{    0,   0,   0,   0,   0,   0,   0,   0    }, // notenmbr
-			{    0,   0,   0,   0,   0,   0,   0,   0    }  // notevelo
-			//   0    1    2    3    4    5    6    7
+			//                     |<---    w[0-8]f    --->|   |<---    w[0-8]g    --->|
+			// L1f, L2f, L1g, L2g, 0, 1, 2, 3, 4, 5, 6, 7, 8   0, 1, 2, 3, 4, 5, 6, 7, 8
+			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // L1, [0] [2] -> X
+			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // L2, [1] [3] -> X
+			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // notenmbr
+			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }  // notevelo
+			//   0    1    2    3  4  5  6  7  8  9 10 11 12  13 14 15 16 17 18 19 20 21
 		}; // this is bool because i can't fix buffer overflow error that comes with int lol
 		int mmctr;
 		
@@ -486,11 +487,12 @@ class ofApp : public ofBaseApp{
 
 		// vm
 		char M[MEMLEN];
-		// programs (patches)
+		// programs (patches) [0-9]
 		string prgms[NPRGMS]={
-			"I0n0g0c51P0c3a 10p11q12r13s fa.................................................................",
 			"I0nog0c51Poc3a 10p11p12q13q fam\\ ~2...........................................................",
-			"mAI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2..................................."
+			"mAI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2...................................",
+			"raZLPLc35I0mZ~3f4z806Azc 16cckqcnrntg0 c.a....................................................",
+			"AZ[#2|%#6|H#a|T i00i10i20i30p0'p1$p2Gp3Sc2uc6xca,ce;nvg0 c&ic&lc&oc&rf4 mf...................c"
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
