@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 6
+#define NPRGMS 9
 
 class phasor{
 public:
@@ -495,7 +495,10 @@ class ofApp : public ofBaseApp{
 			"raZLPLc35I0mZ~3f4z806Azc 16cckqcnrntg0 c.a....................................................",
 			"AZ[#2|%#6|H#a|T i00i10i20i30p0'p1$p2Gp3Sc2uc6xca,ce;nvg0 c&ic&lc&oc&rf4 mf...................c",
 			"m.p0Ii00`01raZIce4 x0d150arg0csocs7 i1r`14 x1e1617c...........................................",
-			"n,g0r020#17,p0,cbei0.m.`03i1p10s11rp1.cb.i20`24 c3-f8Vc7 x041570zc&EAh1......................."
+			"n,g0r020#17,p0,cbei0.m.`03i1p10s11rp1.cb.i20`24 c3-f8Vc7 x041570zc&EAh1.......................",
+			"x141i00mg`02i10`13630en,g0p0,cnsfa cp6 x051500Z cpep1, cn% /020cpC cE=`24 i2g x3f1............",
+			"N^1P+0=|Nz#+isx.*|zFUE>.68<}<\"eV)UL*\"teSRyQa,n0|m+O6NF^UO^bO)4Jd+]LhY$VGcBQt|..m,h;dX9+.GY t:N",
+			"600r x101 x0d1`04i0mmhi10i20nvg0 c;1/020cv.71nv `12i1zp1vc`* `22i2dp2BraZBcPL................."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
