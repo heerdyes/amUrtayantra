@@ -496,6 +496,7 @@ class ofApp : public ofBaseApp{
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
+		string CMD=".ng^AvV><L1!fc=b+#-*X%iI/mpP`~zretx5678";
 		int pc;
 		int ec;
 		ofTrueTypeFont fnt;

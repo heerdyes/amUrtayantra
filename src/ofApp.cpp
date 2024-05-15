@@ -52,22 +52,25 @@ void ofApp::cyclevm(){
     char code=M[pc];
     int pos,src,dst,xpc,arg1,arg2,arg3,arg4;
     int ma1,ma2;
-    float hh,r0,cw=18.;
+    float hh,r0,cw=18.,ch=20.;
     switch(code){
         case '.':
             pc=0;
             break;
         case 'n':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             M[pc]=AB[activenote];
             pc=(pc+1)%MEMLEN;
             break;
         case 'g':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             M[pc]=AB[floor(ofMap(notevelo,0,127,0,MEMLEN))];
             pc=(pc+1)%MEMLEN;
             break;
         case '^': // ramp up wraparound
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             pos=AB.find(M[pc]);
             if(pos!=-1){
@@ -76,6 +79,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '>': // ++ if M[arg1] multiple of arg2: > 'addr' 'num' '_'
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -90,6 +94,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '<': // ++ if M[arg1] multiple of arg2: > 'addr' 'num' '_'
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -104,6 +109,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'A': // ramp up till limit
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -112,6 +118,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'v': // ramp down wraparound
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             pos=AB.find(M[pc]);
             if(pos!=-1){
@@ -120,6 +127,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'V': // ramp down from limit
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -128,6 +136,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'L': // delay loop
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pos=(pc+1)%MEMLEN;
             arg1=AB.find(M[pos]);
             xpc=(pc+2)%MEMLEN;
@@ -140,6 +149,7 @@ void ofApp::cyclevm(){
             }
             break;
         case '1': // oscillator tuning
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -150,6 +160,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '!': // tuning all oscs at once
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
@@ -160,6 +171,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'f':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             pos=AB.find(M[pc]);
             if(pos!=-1){
@@ -168,6 +180,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'c': // cp OR patch/connect
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             src=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -185,6 +198,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '=': // conditional assignment
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]); // addr of recipient
             pc=(pc+1)%MEMLEN;
@@ -199,6 +213,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'b': // jnz
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -210,6 +225,7 @@ void ofApp::cyclevm(){
             }
             break;
         case '+':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -221,6 +237,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '#':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             ma1=AB.find(M[arg1]);
@@ -234,6 +251,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '-':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -245,6 +263,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '*':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -256,6 +275,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'X':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             ma1=AB.find(M[arg1]);
@@ -269,6 +289,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '%':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -280,6 +301,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'i': // per oscillator gain
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -290,6 +312,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'I': // all oscillators gain
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
@@ -300,6 +323,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '/':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -311,6 +335,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'm':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
@@ -319,6 +344,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'p': // per osc note: p <oscnum> <notenum>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -330,6 +356,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'P': // each osc note: P <notenum>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
@@ -340,6 +367,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '`': // per osc wave type: ` <oscnum> <osctyp>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -350,6 +378,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '~': // every osc wave type: ~ <osctyp>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
@@ -360,6 +389,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'z':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -395,6 +425,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'r': // rndgen
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -406,6 +437,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 'e': // TODO: implement audio rate envelopes at once!
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,5*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -436,18 +468,20 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case 't': // binarizer/thresholder
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]); // addr of the input
             pc=(pc+1)%MEMLEN;
             xpc=pc; // the location of the fixed output constant
             pc=(pc+1)%MEMLEN;
-            if(arg1!=-1&&arg2!=-1){
+            if(arg1!=-1){
                 arg3=AB.find(M[arg1]); // actual input
                 M[pc]=arg3>0?M[xpc]:'0'; // hi/lo binary output
             }
             pc=(pc+1)%MEMLEN;
             break;
         case 'x':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -460,6 +494,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '5': // lfo1 <freq:bichar> <gain:char>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -474,6 +509,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '6': // lfo2 <freq> <gain>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
@@ -488,6 +524,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '7': // lfo1 <type>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
@@ -496,6 +533,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             break;
         case '8': // lfo2 <type>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
@@ -518,7 +556,7 @@ void ofApp::initsynth(){
         w[i][4]=new noyz(110,0.4);
         wtyp[i]=0;
         rootf[i]=52.0;
-        gain[i]=1./NOSCS;
+        gain[i]=0.; // vol 0 to start with
     }
     // lfo wavs
     lfo1[0] = new lfosyn(2, 10);
@@ -768,7 +806,6 @@ void ofApp::rndrlfos(float x,float y){
 void ofApp::rndrmodmat(float x,float y){
     ofSetColor(23,202,232);
     float cw=22,ch=24;
-    char q[2];
     char s[3];
     fnt.drawString("src",x,y+ch);
     fnt.drawString("dst",x+cw,y);
@@ -776,8 +813,6 @@ void ofApp::rndrmodmat(float x,float y){
     ofFill();
     for(int i=0;i<MMROWS;i++){
         for(int j=0;j<MMCOLS;j++){
-//             sprintf(q,"%d",modmat[i][j]);
-//             fnt.drawString(q,x+(j+2)*cw*2,y+(i+2)*ch);
             if(modmat[i][j]){
                 ofDrawRectangle(x-5+(j+2)*cw*2,y+5+(i+1)*ch,cw,ch);
             }
