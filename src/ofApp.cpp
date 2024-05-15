@@ -711,7 +711,7 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
         for(int i=0;i<NOSCS;i++){
             mix += gain[i] * w[i][wtyp[i]]->y;
         }
-		float lmono = mgain * mix; // for now L/MONO
+		float lmono = mix>1?mghi:mgain*mix; // for now L/MONO
 		// write out
 		outBuffer.getSample(i, 0) = lmono;
 		outBuffer.getSample(i, 1) = lmono;
@@ -996,6 +996,14 @@ void ofApp::keyPressed(int key){
     // program (patch) memory [0-9] check prgms str arr
     if(key>=48&&key<=57&&ladown){
         loadprogram(key-48);
+        return;
+    }
+    if(key==114&&ladown){
+        clrmodmat();
+        for(int i=0;i<MEMLEN;i++){
+            int idx=(int)ofRandom(0,1024);
+            M[i]=AB[idx%MEMLEN];
+        }
         return;
     }
     M[ec]=key;
