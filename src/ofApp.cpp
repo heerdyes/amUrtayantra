@@ -646,8 +646,7 @@ void ofApp::modgain(bool mmij, int arg, phasor * ww){
     }
 }
 
-// this needs massive changes after multi-oscillator implementation
-// for now hard-coding w1, w2 -> w[0], w[1]
+// [TOTHINK] more lfos needed?
 void ofApp::xmod(){
     int mmi=mmctr/MMCOLS;
     int mmj=mmctr%MMCOLS;
@@ -809,6 +808,7 @@ void ofApp::rndrlfos(float x,float y){
     }
 }
 
+// [TODO] enable weights for mod matrix
 void ofApp::rndrmodmat(float x,float y){
     ofSetColor(23,202,232);
     float cw=22,ch=24;
@@ -835,16 +835,20 @@ void ofApp::rndrmodmat(float x,float y){
     for(int i=0;i<MMCOLS;i++){
         sprintf(s,"%c",AB[i]);
         fnt.drawString(s,x+cw*(4+i*2),y+ch);
+        if(i>=4){
+            sprintf(s,"%d",(i-4)%NOSCS);
+            fnt.drawString(s,x+cw*(4+i*2),y);
+        }
     }
     //
     fnt.drawString("L1f",x+cw*4,y);
     fnt.drawString("L2f",x+cw*6,y);
     fnt.drawString("L1g",x+cw*8,y);
     fnt.drawString("L2g",x+cw*10,y);
-    ofDrawLine(x+cw*12,y+4,x+cw*29,y+4);
-    fnt.drawString("w[0-8]f",x+cw*18,y);
-    ofDrawLine(x+cw*30,y+4,x+cw*47,y+4);
-    fnt.drawString("w[0-8]g",x+cw*36,y);
+    ofDrawLine(x+cw*12,y+4-ch,x+cw*29,y+4-ch);
+    fnt.drawString("w[0-8]f",x+cw*18,y-ch);
+    ofDrawLine(x+cw*30,y+4-ch,x+cw*47,y+4-ch);
+    fnt.drawString("w[0-8]g",x+cw*36,y-ch);
     ofDrawLine(x+cw*3,y+ch+3,x+cw*(5+(MMCOLS-1)*2),y+ch+3);
 }
 
@@ -872,7 +876,7 @@ void ofApp::f5(float x,float y,int times){
         // rndr
         rndryc(ofGetHeight()-200-30);
         rndrmem(y);
-        rndrmodmat(112,144);
+        rndrmodmat(112,170);
         rndrlfos(ofGetWidth()*0.66,144);
         ofSetColor(0,240,0);
         ofSetLineWidth(1 + (rms * 30.));
