@@ -711,7 +711,13 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
         for(int i=0;i<NOSCS;i++){
             mix += gain[i] * w[i][wtyp[i]]->y;
         }
-		float lmono = mix>1?mghi:mgain*mix; // for now L/MONO
+		float lmono=mgain*mix;
+        // guards
+		if(lmono>0.99){
+            lmono=mghi;
+        }else if(lmono<-0.99){
+            lmono=-mghi;
+        }
 		// write out
 		outBuffer.getSample(i, 0) = lmono;
 		outBuffer.getSample(i, 1) = lmono;
