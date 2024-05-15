@@ -52,7 +52,7 @@ void ofApp::cyclevm(){
     char code=M[pc];
     int pos,src,dst,xpc,arg1,arg2,arg3,arg4;
     int ma1,ma2;
-    float hh,r0;
+    float hh,r0,cw=18.;
     switch(code){
         case '.':
             pc=0;
@@ -176,8 +176,11 @@ void ofApp::cyclevm(){
                 M[dst]=M[src];
                 color12(cablehues[pc%NHUES]);
                 hh=ofMap(pc,0,MEMLEN-1,vmy+36.,vmy+69.);
-                ofDrawLine(vmx+src*16,hh,vmx+10+src*16,hh);
-                ofDrawLine(vmx+dst*16,hh,vmx+10+dst*16,hh);
+                r0=(vmx+5+src*cw + vmx+5+dst*cw) / 2.;
+                ofDrawLine(vmx+src*cw,hh,vmx+10+src*cw,hh);
+                ofDrawLine(vmx+dst*cw,hh,vmx+10+dst*cw,hh);
+                ofDrawLine(vmx+5+src*cw,hh,r0,hh+30);
+                ofDrawLine(vmx+5+dst*cw,hh,r0,hh+30);
             }
             pc=(pc+1)%MEMLEN;
             break;
