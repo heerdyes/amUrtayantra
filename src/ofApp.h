@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 4
+#define NPRGMS 5
 
 class phasor{
 public:
@@ -204,9 +204,10 @@ public:
 		gain = g;
 		freqref=f;
 		gainref=g;
-		y =1.;
+		y =0.;
 		y_=0;
 		yy=1.;
+		phase=0.0;
 	}
 
 	void update(int sr) {
@@ -492,7 +493,8 @@ class ofApp : public ofBaseApp{
 			"n,vQg0 =3,5c19 P,c3nmd!Q~2 c1gfae4520 =z05I0 c,-..............................................",
 			"mAI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2...................................",
 			"raZLPLc35I0mZ~3f4z806Azc 16cckqcnrntg0 c.a....................................................",
-			"AZ[#2|%#6|H#a|T i00i10i20i30p0'p1$p2Gp3Sc2uc6xca,ce;nvg0 c&ic&lc&oc&rf4 mf...................c"
+			"AZ[#2|%#6|H#a|T i00i10i20i30p0'p1$p2Gp3Sc2uc6xca,ce;nvg0 c&ic&lc&oc&rf4 mf...................c",
+			"m.p0Ii00`01raZIce4 x0d150arg0csocs7 i1r`14 x1e1617c..........................................."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
