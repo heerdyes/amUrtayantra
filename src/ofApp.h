@@ -9,8 +9,10 @@
 #define NHUES 33
 #define NWAVS 5
 #define NLFOWAVS 2
+#define NOSCS 9
 #define MMROWS 4
-#define MMCOLS 8
+#define MMCOLS 22
+#define NPRGMS 5
 
 class phasor{
 public:
@@ -202,9 +204,10 @@ public:
 		gain = g;
 		freqref=f;
 		gainref=g;
-		y =1.;
+		y =0.;
 		y_=0;
 		yy=1.;
+		phase=0.0;
 	}
 
 	void update(int sr) {
@@ -446,18 +449,18 @@ class ofApp : public ofBaseApp{
 		float rms;
 
 		// synth
-		phasor * w1[NWAVS];
-		phasor * w2[NWAVS];
+		phasor * w[NOSCS][NWAVS];
 		lfo * lfo1[NLFOWAVS];
 		lfo * lfo2[NLFOWAVS];
 		vector<float> lfo1scope;
 		vector<float> lfo2scope;
 		int lfobufsz;
 		int lfoctr;
-		int w1typ,w2typ,lfo1typ,lfo2typ;
-		float rootf1,rootf2;
+		int wtyp[NOSCS];
+		int lfo1typ,lfo2typ;
+		float rootf[NOSCS];
 		float rootflo,rootfhi;
-		float gain1,gain2;
+		float gain[NOSCS];
 		float gainhi,gainlo;
 		float mgain;
 		float mglo,mghi;
@@ -465,12 +468,13 @@ class ofApp : public ofBaseApp{
 		// TODO: make this configurable later
 		float tuning[12] = {1.0, 17.0/16.0, 9.0/8.0, 19.0/16.0, 5.0/4.0, 4.0/3.0, 17.0/12.0, 3.0/2.0, 19.0/12.0, 5.0/3.0, 85.0/48.0, 15.0/8.0};
 		bool modmat[MMROWS][MMCOLS] = {
-			// L1f, L2f, L1g, L2g, w1f, w2f, w1g, w2g
-			{    0,   0,   0,   0,   0,   0,   0,   0    }, // L1, [0] [2] -> X
-			{    0,   0,   0,   0,   0,   0,   0,   0    }, // L2, [1] [3] -> X
-			{    0,   0,   0,   0,   0,   0,   0,   0    }, // notenmbr
-			{    0,   0,   0,   0,   0,   0,   0,   0    }  // notevelo
-			//   0    1    2    3    4    5    6    7
+			//                     |<---    w[0-8]f    --->|   |<---    w[0-8]g    --->|
+			// L1f, L2f, L1g, L2g, 0, 1, 2, 3, 4, 5, 6, 7, 8   0, 1, 2, 3, 4, 5, 6, 7, 8
+			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // L1, [0] [2] -> X
+			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // L2, [1] [3] -> X
+			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // notenmbr
+			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }  // notevelo
+			//   0    1    2    3  4  5  6  7  8  9 10 11 12  13 14 15 16 17 18 19 20 21
 		}; // this is bool because i can't fix buffer overflow error that comes with int lol
 		int mmctr;
 		
@@ -484,17 +488,29 @@ class ofApp : public ofBaseApp{
 
 		// vm
 		char M[MEMLEN];
-		// programs (patches)
-		string p0="i0j0m~n0g0c91c931s2r3242p0q0c7pc7r...............................................................";
-		string p1="i0j0m~n0g0c91c931s2s3242x04153fdp0q0c7xc7z.......................................................";
-		string p2="i0j0m~n0g0raZap0q0cdfcdh1s2u3141.................................................................";
+		// programs (patches) [0-9]
+		string prgms[NPRGMS]={
+			"n,vQg0 =3,5c19 P,c3nmd!Q~2 c1gfae4520 =z05I0 c,-..............................................",
+			"mAI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2...................................",
+			"raZLPLc35I0mZ~3f4z806Azc 16cckqcnrntg0 c.a....................................................",
+			"AZ[#2|%#6|H#a|T i00i10i20i30p0'p1$p2Gp3Sc2uc6xca,ce;nvg0 c&ic&lc&oc&rf4 mf...................c",
+			"m.p0Ii00`01raZIce4 x0d150arg0csocs7 i1r`14 x1e1617c..........................................."
+		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
+		string CMD=".ng^AvV><L1!fc=b+#-*X%iI/mpP`~zretx5678";
 		int pc;
 		int ec;
 		ofTrueTypeFont fnt;
 		int f5times;
-		int cablehues[NHUES]={0x00f,0x0f0,0xf00, 0x01e,0x1e0,0x10e, 0x02d,0x2d0,0x20d, 0x03c,0x3c0,0x30c, 0x04b,0x4b0,0x40b, 0x05a,0x5a0,0x50a,0x069,0x690,0x609, 0x078,0x780,0x708, 0x087,0x870,0x807, 0x096,0x960,0x906, 0x0a5,0xa50,0xa05};
+		int cablehues[NHUES]={
+			0x00f,0x0f0,0xf00, 0x01e,0x1e0,0x10e, 0x02d,0x2d0,0x20d, 0x03c,0x3c0,0x30c,
+			0x04b,0x4b0,0x40b, 0x05a,0x5a0,0x50a, 0x069,0x690,0x609, 0x078,0x780,0x708,
+			0x087,0x870,0x807, 0x096,0x960,0x906, 0x0a5,0xa50,0xa05
+		};
+
+		// "mAI0n[g0c73P[c5c10m11\12y13Fvmcti#t4\ c,l#t8y c=o#tcF c$r~2..................................."
+		//  0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:"{}_+|~
 
 		// key gestures
 		int lcdown;
