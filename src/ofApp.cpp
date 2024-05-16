@@ -41,6 +41,16 @@ void ofApp::initvm(){
     vmy=55.;
 }
 
+void ofApp::initlogo(){
+    for(int i=0;i<NOSCS;i++){
+        float x=ofRandom(0,ofGetWidth());
+        float y=ofRandom(0,ofGetHeight());
+        tx[i]=new trtl(x,y,1,0);
+    }
+    txctr=0;
+    tpc=0;
+}
+
 void ofApp::color12(int c){
     int b=ofMap(c&0xf,0,0xf,0,255);
     int g=ofMap((c&0xf0)>>4,0,0xf,0,255);
@@ -585,6 +595,30 @@ void ofApp::initsynth(){
     mghi=0.75;
 }
 
+void ofApp::initcam(){
+    camw=640;
+    camh=480;
+    vdo.setVerbose(true);
+    vdo.setup(camw,camh);
+    camfnt.load("OCRA",8);
+    asciiChars=string("    ,./:;`~'\"+=()[]%%{}**");
+}
+
+void ofApp::rndrcam(ofPixelsRef & pixelsRef){
+    ofSetColor(255,255,255,ofMap(mouseX,0,ofGetWidth(),0,255));
+    float px = ofGetWidth()/2 - camw/2;
+    float py = ofGetHeight()/2 - camh/2;
+    vdo.draw(px,py);
+    // ascii scan-line overlay (otherwise it slows down audio)
+    ofSetHexColor(0xffd700);
+    for (int i = 0; i < camw; i+= 6){
+        float lightness = pixelsRef.getColor(i,camj).getLightness();
+        int c = powf(ofMap(lightness, 0, 255, 0, 1), 2.75) * asciiChars.size();
+        camfnt.drawString(ofToString(asciiChars[c]), px+i, py+camj);
+    }
+    camj=(camj+8)%camh;
+}
+
 void ofApp::setup(){
     ofSetWindowTitle("amUrtayantra"); // amUrtayantra it is!
     ofSetVerticalSync(true);
@@ -594,6 +628,8 @@ void ofApp::setup(){
     setupsndsys();
     initvm();
     initsynth();
+    initlogo();
+    initcam();
 
     fnt.load("OCRA",14,true,true);
 }
@@ -624,6 +660,9 @@ void ofApp::update(){
     lfo1scope.erase(lfo1scope.begin());
     lfo2scope.push_back(lfo2[lfo2typ]->y);
     lfo2scope.erase(lfo2scope.begin());
+
+    // cam update
+    vdo.update();
 }
 
 //--------------------------------------------------------------
@@ -867,7 +906,17 @@ void ofApp::kbsweep(){
     }
 }
 
-void ofApp::f5(float x,float y,int times){
+void ofApp::trtlwalk(){
+    for(int i=0;i<NOSCS;i++){
+        tx[i]->rndr();
+        tx[i]->sens(tx[(i+1)%NOSCS]);
+    }
+    for(int i=0;i<NOSCS;i++){
+        tx[i]->walk();
+    }
+}
+
+void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
     for(int i=0;i<times;i++){
         ofBackground(0,0,0);
         ofSetColor(0,240,0);
@@ -878,6 +927,11 @@ void ofApp::f5(float x,float y,int times){
         rndrmem(y);
         rndrmodmat(112,170);
         rndrlfos(ofGetWidth()*0.66,144);
+        // logo
+        trtlwalk();
+        // asciicam
+        rndrcam(pixelsRef);
+        // oscope
         ofSetColor(0,240,0);
         ofSetLineWidth(1 + (rms * 30.));
         waveform.draw();
@@ -910,7 +964,8 @@ void ofApp::loadprogram(int pid){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    f5(vmx,vmy,f5times);
+    ofPixelsRef pixelsRef = vdo.getPixels();
+    f5(vmx,vmy,f5times,pixelsRef);
 }
 
 //--------------------------------------------------------------
