@@ -1066,9 +1066,14 @@ void ofApp::keyPressed(int key){
         pc=0;
         return;
     }
-    // program (patch) memory [0-9] check prgms str arr
+    // program (patchgram) memory [0-9] check prgms str arr
     if(key>=48&&key<=57&&ladown){
         loadprogram(key-48);
+        return;
+    }
+    // extended program memory [a-z] :D
+    if(key>=97&&key<=122&&ladown){
+        loadprogram(key-97+10);
         return;
     }
     if(key==114&&ladown){
