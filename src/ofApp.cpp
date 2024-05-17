@@ -234,6 +234,14 @@ void ofApp::cyclevm(){
                 pc=(pc+1)%MEMLEN;
             }
             break;
+        case 'B': // unconditional jump
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                pc=arg1;
+            }
+            break;
         case '+':
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
