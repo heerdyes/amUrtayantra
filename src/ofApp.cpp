@@ -198,7 +198,7 @@ void ofApp::cyclevm(){
             if(src!=-1&&dst!=-1){
                 M[dst]=M[src];
                 color12(cablehues[pc%NHUES]);
-                hh=ofMap(pc,0,MEMLEN-1,vmy+36.,vmy+69.);
+                hh=vmy+40.;
                 r0=(vmx+5+src*cw + vmx+5+dst*cw) / 2.;
                 ofDrawLine(vmx+src*cw,hh,vmx+10+src*cw,hh);
                 ofDrawLine(vmx+dst*cw,hh,vmx+10+dst*cw,hh);
