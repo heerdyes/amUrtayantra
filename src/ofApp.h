@@ -14,6 +14,79 @@
 #define MMCOLS 22
 #define NPRGMS 10
 
+class trtl{
+public:
+	float x,y,a;
+	float slen,swid;
+	float step,turn;
+	float df2,db2;
+	float turncoeff,stepcoeff;
+
+	trtl(float xx,float yy,float st,float tn){
+		x=xx;
+		y=yy;
+		a=90.;
+		slen=6.;
+		swid=3.;
+		step=st;
+		turn=tn;
+		turncoeff=0.011;
+		stepcoeff=0.05;
+	}
+
+	void fd(float r){
+		float rads=a*PI/180.;
+		float x2=x+r*cos(rads);
+		float y2=y-r*sin(rads);
+		if(x2>ofGetWidth()){ x2=x2-ofGetWidth(); }
+		if(x2<0){ x2=x2+ofGetWidth(); }
+		if(y2>ofGetHeight()){ y2=y2-ofGetHeight(); }
+		if(y2<0){ y2=y2+ofGetHeight(); }
+		ofDrawLine(x,y,x2,y2);
+		x=x2;
+		y=y2;
+	}
+
+	void bk(float r){ fd(-r); }
+
+	void lt(float phi){ a+=phi; }
+
+	void rt(float phi){ lt(-phi); }
+
+	void sens(trtl * q){
+		float k=PI/180.;
+		float fx=x+slen*cos(a*k);
+		float fy=y-slen*sin(a*k);
+		df2=powf(q->x-fx,2.)+powf(q->y-fy,2.);
+		db2=powf(q->x-x,2.)+powf(q->y-y,2.);
+		// feedback
+		float dfb=sqrt(df2)-sqrt(db2);
+		turn+=turncoeff*dfb;
+		float db=sqrt(db2);
+		float tmp=stepcoeff*db;
+		step=tmp>8?8:tmp;
+	}
+
+	void walk(){
+		fd(step);
+		lt(turn);
+	}
+
+	void rndr(){
+		float k=PI/180.;
+		float plx=x+swid/2*cos((a+90)*k);
+		float ply=y-swid/2*sin((a+90)*k);
+		float prx=x+swid/2*cos((a-90)*k);
+		float pry=y-swid/2*sin((a-90)*k);
+		float pfx=x+slen*cos(a*k);
+		float pfy=y-slen*sin(a*k);
+		ofSetColor(23,202,232);
+		ofDrawLine(plx,ply,prx,pry);
+		ofDrawLine(plx,ply,pfx,pfy);
+		ofDrawLine(prx,pry,pfx,pfy);
+	}
+};
+
 class phasor{
 public:
 	virtual void update(int sr) = 0;
@@ -430,7 +503,7 @@ class ofApp : public ofBaseApp{
 		void initvm();
 		void cyclevm();
 		void rndrmem(float y);
-		void f5(float x,float y,int times);
+		void f5(float x,float y,int times,ofPixelsRef & pixelsRef);
 		void color12(int c);
 		void initsynth();
 		void rndrmodmat(float x,float y);
@@ -440,6 +513,10 @@ class ofApp : public ofBaseApp{
 		void xmod();
 		void clrmodmat();
 		void loadprogram(int pid);
+		void initlogo();
+		void trtlwalk();
+		void initcam();
+		void rndrcam(ofPixelsRef & pixelsRef);
 
 		// audio
 		std::mutex audioMutex;
@@ -502,7 +579,7 @@ class ofApp : public ofBaseApp{
 			"600r x101 x0d1`04i0mmhi10i20nvg0 c;1/020cv.71nv `12i1zp1vc`* `22i2dp2BraZBcPL.................",
 			"^? i0omm p0[n[cdb `0>c1kf4 x0d150)z x10160_u i10`13p1[cd%e5a20g0 =C0F/020 cDM cO  x151........",
 
-			".............................................................................................."
+			"g0/020c13/020c5ai00i10i20c1ic5lccop0tp1[p2%nt#=|[#)|% c=,c);c$]`03`13`23mmfb10p11p12p........c"
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
@@ -527,4 +604,15 @@ class ofApp : public ofBaseApp{
 
 		// gui
 		float vmx,vmy;
+
+		// logo
+		trtl * tx[NOSCS];
+		int txctr;
+		int tpc; // turtle vm
+
+		// asciicam
+		ofVideoGrabber vdo;
+		int camw,camh,camj=0;
+		string asciiChars;
+		ofTrueTypeFont camfnt;
 };
