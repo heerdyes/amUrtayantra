@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 11
+#define NPRGMS 13
 
 class trtl{
 public:
@@ -566,6 +566,7 @@ class ofApp : public ofBaseApp{
 		// vm
 		char M[MEMLEN];
 		// programs (patches) [0-9]
+		// sooner or later these are going to go into a file ;-P
 		string prgms[NPRGMS]={
 			"n,vQg0 =3,5c19 P,c3nmd!Q~2 c1gfae4520 =z05I0 c,-..............................................",
 			"mAI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2...................................",
@@ -580,7 +581,10 @@ class ofApp : public ofBaseApp{
 			"^? i0omm p0[n[cdb `0>c1kf4 x0d150)z x10160_u i10`13p1[cd%e5a20g0 =C0F/020 cDM cO  x151........",
 
 			"g0/020c13/020c5ai00i10i20c1ic5lccop0tp1[p2%nt#=|[#)|% c=,c);c$]`03`13`23mmfb10p11p12p........c",
-			"n,g0mhf5B............................V85+,c)c1[A81p1)c!#c-$i10c!C/030c3IcKD`11c!Sb;..........."
+			"n,g0mhf5B............................V85+,c)c1[A81p1)c!#c-$i10c!C/030c3IcKD`11c!Sb;...........",
+			"V87i70c24V00cb5g0cgap70c2lcgm`7xc2ufanx c/v...................................................",
+
+			"n&g0v2X5|4p36c5bc9ci30c5km5e3620 =u03 cvlf4`33 c5=r093 c%\\ x041555Z..........................2"
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
