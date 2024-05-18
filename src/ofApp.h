@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 16
+#define NPRGMS 17
 #define NHARM 8
 
 #define SMPLRATE 44100
@@ -689,9 +689,10 @@ class ofApp : public ofBaseApp{
 
 			"n&g0v2X5|4p36c5bc9ci30c5km5e3620 =u03 cvlf4`33 c5=r093 c%\\ x041555Z..........................2",
 			"A82%251c24`21c2bc6ci20c2km9p2xc2snx cyte6920g0 =]0\\ c-lf7rrtt12t cCFc2E.......................",
-			"msqynyc53Vi6ci1Xb|o h10 Vaac.mf5g0#xq0.......................................................4",
+			"m,q,n,c53Vi8ci1Xb|w h16 Va5c.mf5g0#xq5j0g0/030 c[- c\\;.......................................4",
 
-			"mejxVz4cs3 h31iqonocigf2eza1ng0 =r0u c-dX62Sr033 c c `04i0Zx0d1 x10160wx80 `14i1ox1e1........."
+			"mejxVz4cs3 h31iqonocigf2eza1ng0 =r0u c-dX62Sr033 c c `04i0Zx0d1 x10160wx80 `14i1ox1e1.........",
+			"mmj0q,n,g0c75c93h26if6^j%jzicnpcrjvr%rm6cz. c;i `02i00 p0,c7( x0d156zte8820 =P09 cQ% x14163mz."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
