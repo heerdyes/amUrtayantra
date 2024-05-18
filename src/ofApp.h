@@ -12,7 +12,13 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 14
+#define NPRGMS 16
+#define NHARM 8
+
+#define SMPLRATE 44100
+#define BUFSZ 512
+#define NBUF 4
+#define NOUTCH 2
 
 class trtl{
 public:
@@ -472,6 +478,100 @@ public:
 	float yy;
 };
 
+// harmonic series synth
+class hxsyn {
+public:
+	hxsyn(int n, float f, float g, float kf, float kg) {
+		nhx=n;
+		F=f;
+		G=g;
+		kF=kf;
+		kG=kg;
+		hx=new syn*[nhx];
+		for(int i=0;i<nhx;i++){
+			hx[i]=new syn(40.,0.);
+		}
+		for(int i=0;i<BUFSZ;i++){
+			buf[i]=0.;
+		}
+		uctr=0;
+		sethxfreq();
+		sethxgain();
+		y=0.;
+		yy=0.;
+	}
+
+	void update(int sr) {
+		yy=0.;
+		for(int i=0;i<nhx;i++){
+			yy+=hx[i]->y;
+			hx[i]->update(sr);
+		}
+		y=G*yy;
+		buf[uctr]=y;
+		uctr=(uctr+1)%BUFSZ;
+	}
+
+	void sethxfreq(){
+		float facc=F;
+		for(int i=0;i<nhx;i++){
+			hx[i]->command(0, facc);
+			facc*=kF;
+		}
+	}
+
+	void sethxgain(){
+		float gacc=1.;
+		for(int i=0;i<nhx;i++){
+			hx[i]->command(1, gacc);
+			gacc*=kG;
+		}
+	}
+
+	void command(int cc, float cv){
+		switch(cc){
+			case 0:
+				F=cv<33?33:cv;
+				Fref=F;
+				sethxfreq();
+				break;
+			case 1:
+				G=cv>1?1:(cv<0?0:cv);
+				Gref=G;
+				break;
+			case 2:
+				kF=cv;
+				sethxfreq();
+				break;
+			case 3:
+				kG=cv;
+				sethxgain();
+				break;
+		}
+	}
+
+	void modulate(int mc, float mv){
+		float tmp;
+		switch(mc){
+			case 0:
+				F=Fref+mv;
+				F=F<33?33:F;
+				break;
+			case 1:
+				tmp=Gref*mv;
+				G=tmp>1?1:(tmp<0?0:tmp);
+				break;
+		}
+	}
+
+	float yy,y;
+	int nhx,uctr;
+	float G,F,Gref,Fref;
+	float kF,kG;
+	syn ** hx;
+	float buf[BUFSZ];
+};
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -554,6 +654,9 @@ class ofApp : public ofBaseApp{
 			//   0    1    2    3  4  5  6  7  8  9 10 11 12  13 14 15 16 17 18 19 20 21
 		}; // this is bool because i can't fix buffer overflow error that comes with int lol
 		int mmctr;
+		// harmonic synthesis
+		float roothx;
+		hxsyn * hxs;
 		
 		// midi
 		u_char * yc;
@@ -585,7 +688,10 @@ class ofApp : public ofBaseApp{
 			"V87i70c24V00cb5g0cgap70c2lcgm`7xc2ufanx c/v...................................................",
 
 			"n&g0v2X5|4p36c5bc9ci30c5km5e3620 =u03 cvlf4`33 c5=r093 c%\\ x041555Z..........................2",
-			"A82%251c24`21c2bc6ci20c2km9p2xc2snx cyte6920g0 =]0\\ c-lf7rrtt12t cCFc2E......................."
+			"A82%251c24`21c2bc6ci20c2km9p2xc2snx cyte6920g0 =]0\\ c-lf7rrtt12t cCFc2E.......................",
+			"msqynyc53Vi6ci1Xb|o h10 Vaac.mf5g0#xq0.......................................................4",
+
+			"mejxVz4cs3 h31iqonocigf2eza1ng0 =r0u c-dX62Sr033 c c `04i0Zx0d1 x10160wx80 `14i1ox1e1........."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
