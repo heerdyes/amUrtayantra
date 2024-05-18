@@ -19,10 +19,10 @@ void ofApp::setupyc(){
 
 void ofApp::setupsndsys(){
     ofSoundStreamSettings settings;
-	settings.numOutputChannels = 2;
-	settings.sampleRate = 44100;
-	settings.bufferSize = 512;
-	settings.numBuffers = 4;
+	settings.numOutputChannels = NOUTCH;
+	settings.sampleRate = SMPLRATE;
+	settings.bufferSize = BUFSZ;
+	settings.numBuffers = NBUF;
 	settings.setOutListener(this);
 	soundStream.setup(settings);
 }
@@ -559,6 +559,39 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
+        case 'h': // harmonix timbre
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]); // <arg1>.<arg2> frequency ratio is fractional
+            pc=(pc+1)%MEMLEN;
+            arg3=AB.find(M[pc]); // .<arg3> gain ratio < 1
+            if(arg1!=-1&&arg2!=-1&&arg3!=-1){
+                r0=(float)arg1+ofMap(arg2,0,MEMLEN,0.,1.);
+                hxs->command(2,r0);
+                hxs->command(3,ofMap(arg3,0,MEMLEN,0.,1.));
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
+        case 'q': // harmonix note: q <notenum>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            if(arg1!=-1){
+                hxs->command(0,idx2freq(arg1,roothx));
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
+        case 'j': // harmonix gain
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            if(arg1!=-1){
+                hxs->command(1,ofMap(arg1,0,MEMLEN,0.,1.));
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
         default:
             pc=(pc+1)%MEMLEN;
     }
@@ -576,6 +609,9 @@ void ofApp::initsynth(){
         rootf[i]=52.0;
         gain[i]=0.; // vol 0 to start with
     }
+    // harmonic synthesis
+    hxs=new hxsyn(NHARM,111.,0.,3.,0.33);
+    roothx=52.;
     // lfo wavs
     lfo1[0] = new lfosyn(2, 10);
 	lfo2[0] = new lfosyn(2, 10);
@@ -644,23 +680,17 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    // "lastBuffer" is shared between update() and audioOut(), which are called
-	// on two different threads. This lock makes sure we don't use lastBuffer
-	// from both threads simultaneously (see the corresponding lock in audioOut())
-	unique_lock<mutex> lock(audioMutex);
-
-	// the x coordinates are evenly spaced on a grid from 0 to the window's width
-	// the y coordinates map each audio sample's range (-1 to 1) to the height
-	// of the window
+    // lock the buffer
+    unique_lock<mutex> lock(audioMutex);
 
 	waveform.clear();
 	for(size_t i = 0; i < lastBuffer.getNumFrames(); i++) {
+        // graphing
 		float sample = lastBuffer.getSample(i, 0);
 		float x = ofMap(i, 0, lastBuffer.getNumFrames(), 0, ofGetWidth());
 		float y = ofMap(sample, -1, 1, 0, ofGetHeight());
 		waveform.addVertex(x, y);
 	}
-
 	rms = lastBuffer.getRMSAmplitude();
 
     // record lfo variation
@@ -757,6 +787,7 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
         for(int i=0;i<NOSCS;i++){
             mix += gain[i] * w[i][wtyp[i]]->y;
         }
+        mix += hxs->buf[i]; // hx synth
 		float lmono=mgain*mix;
         // guards
 		if(lmono>0.99){
@@ -775,6 +806,8 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
         }
 		lfo1[lfo1typ]->update(sr);
         lfo2[lfo2typ]->update(sr);
+        // harmonic series update
+        hxs->update(sr);
 	}
 
 	unique_lock<mutex> lock(audioMutex);
