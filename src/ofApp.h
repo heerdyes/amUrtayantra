@@ -618,6 +618,7 @@ class ofApp : public ofBaseApp{
 		void trtlwalk();
 		void initcam();
 		void rndrcam(ofPixelsRef & pixelsRef);
+		void initshdr();
 
 		// audio
 		std::mutex audioMutex;
@@ -729,4 +730,9 @@ class ofApp : public ofBaseApp{
 		int camw,camh,camj=0;
 		string asciiChars;
 		ofTrueTypeFont camfnt;
+
+		// shading
+		ofShader shdr;
+		ofPlanePrimitive plane;
+		float t,dt; // time arrives finally!
 };
