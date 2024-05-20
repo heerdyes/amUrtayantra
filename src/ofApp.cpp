@@ -644,8 +644,6 @@ void ofApp::initcam(){
     camh=720;
     vdo.setVerbose(true);
     vdo.setup(camw,camh);
-//     plane.set(camw,camh);
-//     plane.mapTexCoords(0,0,camw,camh);
     plane.set(ofGetWidth(),ofGetHeight());
     plane.mapTexCoords(0,0,ofGetWidth(),ofGetHeight());
     camfnt.load("OCRA",8);
@@ -664,9 +662,6 @@ void ofApp::initshdr(){
 }
 
 void ofApp::rndrcam(ofPixelsRef & pixelsRef){
-    ofSetColor(255,255,255);
-    float px = ofGetWidth()/2 - camw/2;
-    float py = ofGetHeight()/2 - camh/2;
     vdo.getTexture().bind();
     shdr.begin();
     //
@@ -683,7 +678,7 @@ void ofApp::rndrcam(ofPixelsRef & pixelsRef){
 }
 
 void ofApp::setup(){
-    ofSetWindowTitle("amUrtayantra"); // amUrtayantra it is!
+    ofSetWindowTitle("amUrtayantra"); // amUrtayantra it is! although fullscreen ensures you'll never see the name
     ofSetVerticalSync(true);
     ofBackground(0,0,0);
 
@@ -983,7 +978,6 @@ void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
     // shadercam
     rndrcam(pixelsRef);
     for(int i=0;i<times;i++){
-//         ofBackground(0,0,0);
         ofSetColor(0,240,0);
         // monophonic key sweeping
         kbsweep();
