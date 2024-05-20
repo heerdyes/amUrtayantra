@@ -19,6 +19,7 @@
 #define BUFSZ 512
 #define NBUF 4
 #define NOUTCH 2
+#define SPDLIM 4
 
 class trtl{
 public:
@@ -70,7 +71,7 @@ public:
 		turn+=turncoeff*dfb;
 		float db=sqrt(db2);
 		float tmp=stepcoeff*db;
-		step=tmp>8?8:tmp;
+		step=tmp>SPDLIM?SPDLIM:tmp;
 	}
 
 	void walk(){
