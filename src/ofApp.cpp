@@ -655,25 +655,37 @@ void ofApp::initcam(){
 void ofApp::initshdr(){
     ofDisableArbTex();
     if(ofIsGLProgrammableRenderer()){
-        shdr.load("gl3/vdofx");
+        shdr[0].load("gl3/hypnorgb");
+        shdr[1].load("gl3/lips");
+        shdr[2].load("gl3/quantum");
+        shdr[3].load("gl3/ringhypnosystem");
+        shdr[4].load("gl3/trigonomagnetism");
+        shdr[5].load("gl3/vdofx");
     }else{
-        shdr.load("gl2/vdofx");
+        shdr[0].load("gl2/hypnorgb");
+        shdr[1].load("gl2/lips");
+        shdr[2].load("gl2/quantum");
+        shdr[3].load("gl2/ringhypnosystem");
+        shdr[4].load("gl2/trigonomagnetism");
+        shdr[5].load("gl2/vdofx");
     }
+    curshdr=0;
 }
 
 void ofApp::rndrcam(ofPixelsRef & pixelsRef){
     vdo.getTexture().bind();
-    shdr.begin();
+    int curshdrcopy=curshdr;
+    shdr[curshdrcopy].begin();
     //
-    shdr.setUniform1f("u_time", t);
-    shdr.setUniform2f("u_res", ofGetWidth(), ofGetHeight());
+    shdr[curshdrcopy].setUniform1f("u_time", t);
+    shdr[curshdrcopy].setUniform2f("u_res", ofGetWidth(), ofGetHeight());
     ofPushMatrix();
     ofTranslate(ofGetWidth()/2,ofGetHeight()/2);
     ofRotateRad(PI);
     plane.draw();
     ofPopMatrix();
     //
-    shdr.end();
+    shdr[curshdrcopy].end();
     vdo.getTexture().unbind();
 }
 
@@ -1016,6 +1028,8 @@ void ofApp::loadprogram(int pid){
     }
     ec=0;
     pc=0;
+    // shader select
+    curshdr=pid%NGLSL;
     return;
 }
 
@@ -1028,7 +1042,9 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     int tmp;
-    cout<<key<<endl;
+    if(DEBUG){
+        cout<<key<<endl;
+    }
     if(key==1)    return;
     if(key==2)    return;
     if(key==4)    return;
