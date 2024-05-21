@@ -178,6 +178,17 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
+        case '3': // fine tuning keys
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                finetuning[arg1%12]=ofMap(arg2,0,MEMLEN-1,tunlo,tunhi);
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
         case '!': // tuning all oscs at once
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
@@ -638,6 +649,8 @@ void ofApp::initsynth(){
     //
     rootflo=40.0;
     rootfhi=80.0;
+    tunlo=-3.0;
+    tunhi=3.0;
     activenote=0;
     notevelo=0;
     // osc gains
@@ -745,7 +758,7 @@ void ofApp::update(){
 float ofApp::idx2freq(int note,float basefreq) {
     int octave = note / 12;
     int key = note % 12;
-    return basefreq * pow(2.,(float)octave) * tuning[key];
+    return basefreq * pow(2.,(float)octave) * tuning[key] + finetuning[key];
 }
 
 //--------------------------------------------------------------

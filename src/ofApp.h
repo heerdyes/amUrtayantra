@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 17
+#define NPRGMS 18
 #define NHARM 8
 
 #define SMPLRATE 44100
@@ -646,7 +646,9 @@ class ofApp : public ofBaseApp{
 		float mglo,mghi;
 		// natural (just) scale tuning
 		// TODO: make this configurable later
-		float tuning[12] = {1.0, 17.0/16.0, 9.0/8.0, 19.0/16.0, 5.0/4.0, 4.0/3.0, 17.0/12.0, 3.0/2.0, 19.0/12.0, 5.0/3.0, 85.0/48.0, 15.0/8.0};
+		float tuning[12]     = {1.0, 17.0/16.0, 9.0/8.0, 19.0/16.0, 5.0/4.0, 4.0/3.0, 17.0/12.0, 3.0/2.0, 19.0/12.0, 5.0/3.0, 85.0/48.0, 15.0/8.0};
+		float finetuning[12] = {0.0,       0.0,     0.0,       0.0,     0.0,     0.0,       0.0,     0.0,       0.0,     0.0,       0.0,      0.0};
+		float tunlo,tunhi;
 		bool modmat[MMROWS][MMCOLS] = {
 			//                     |<---    w[0-8]f    --->|   |<---    w[0-8]g    --->|
 			// L1f, L2f, L1g, L2g, 0, 1, 2, 3, 4, 5, 6, 7, 8   0, 1, 2, 3, 4, 5, 6, 7, 8
@@ -695,7 +697,8 @@ class ofApp : public ofBaseApp{
 			"m,q,n,c53Vi8ci1Xb|w h16 Va5c.mf5g0#xq5j0g0/030 c[- c\\;.......................................4",
 
 			"mejxVz4cs3 h31iqonocigf2eza1ng0 =r0u c-dX62Sr033 c c `04i0Zx0d1 x10160wx80 `14i1ox1e1.........",
-			"mmj0q,n,g0c75c93h26if6^j%jzicnpcrjvr%rm6cz. c;i `02i00 p0,c7( x0d156zte8820 =P09 cQ% x14163mz."
+			"mmj0q,n,g0c75c93h26if6^j%jzicnpcrjvr%rm6cz. c;i `02i00 p0,c7( x0d156zte8820 =P09 cQ% x14163mz.",
+			"mjnog0 i00cJ9p0oc3f `01fa 34  qoc3vj0 cA,eak20 ==05h2 r/030 c\\*e6r20 =I05 x04157 8 x1d164l7..."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
