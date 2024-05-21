@@ -169,6 +169,15 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
+        case '2': // harmonix tuning
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            if(arg1!=-1){
+                roothx=ofMap(arg1,0,MEMLEN-1,rootflo,rootfhi);
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
         case '!': // tuning all oscs at once
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
