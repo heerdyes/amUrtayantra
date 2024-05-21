@@ -20,7 +20,7 @@
 #define NBUF 4
 #define NOUTCH 2
 #define SPDLIM 4
-#define NGLSL 6
+#define NGLSL 7
 
 class trtl{
 public:

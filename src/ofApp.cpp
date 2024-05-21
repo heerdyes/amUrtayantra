@@ -683,6 +683,7 @@ void ofApp::initshdr(){
         shdr[3].load("gl3/ringhypnosystem");
         shdr[4].load("gl3/trigonomagnetism");
         shdr[5].load("gl3/vdofx");
+        shdr[6].load("gl3/madkam");
     }else{
         shdr[0].load("gl2/hypnorgb");
         shdr[1].load("gl2/lips");
@@ -690,6 +691,7 @@ void ofApp::initshdr(){
         shdr[3].load("gl2/ringhypnosystem");
         shdr[4].load("gl2/trigonomagnetism");
         shdr[5].load("gl2/vdofx");
+        shdr[6].load("gl2/madkam");
     }
     curshdr=0;
 }
