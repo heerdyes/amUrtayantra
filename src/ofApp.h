@@ -20,6 +20,7 @@
 #define NBUF 4
 #define NOUTCH 2
 #define SPDLIM 4
+#define NGLSL 6
 
 class trtl{
 public:
@@ -618,6 +619,7 @@ class ofApp : public ofBaseApp{
 		void trtlwalk();
 		void initcam();
 		void rndrcam(ofPixelsRef & pixelsRef);
+		void initshdr();
 
 		// audio
 		std::mutex audioMutex;
@@ -729,4 +731,13 @@ class ofApp : public ofBaseApp{
 		int camw,camh,camj=0;
 		string asciiChars;
 		ofTrueTypeFont camfnt;
+
+		// shading
+		ofShader shdr[NGLSL];
+		ofPlanePrimitive plane;
+		int curshdr;
+		float t,dt; // time arrives finally!
+
+		// !programmer! //
+		bool DEBUG=false; // cout filter
 };

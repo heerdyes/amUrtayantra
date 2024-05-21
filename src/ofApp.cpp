@@ -640,31 +640,57 @@ void ofApp::initsynth(){
 }
 
 void ofApp::initcam(){
-    camw=640;
-    camh=480;
+    camw=1280;
+    camh=720;
     vdo.setVerbose(true);
     vdo.setup(camw,camh);
+    plane.set(ofGetWidth(),ofGetHeight());
+    plane.mapTexCoords(0,0,ofGetWidth(),ofGetHeight());
     camfnt.load("OCRA",8);
     asciiChars=string("    ,./:;`~'\"+=()[]%%{}**");
+    t=0.0;
+    dt=0.01;
+}
+
+void ofApp::initshdr(){
+    ofDisableArbTex();
+    if(ofIsGLProgrammableRenderer()){
+        shdr[0].load("gl3/hypnorgb");
+        shdr[1].load("gl3/lips");
+        shdr[2].load("gl3/quantum");
+        shdr[3].load("gl3/ringhypnosystem");
+        shdr[4].load("gl3/trigonomagnetism");
+        shdr[5].load("gl3/vdofx");
+    }else{
+        shdr[0].load("gl2/hypnorgb");
+        shdr[1].load("gl2/lips");
+        shdr[2].load("gl2/quantum");
+        shdr[3].load("gl2/ringhypnosystem");
+        shdr[4].load("gl2/trigonomagnetism");
+        shdr[5].load("gl2/vdofx");
+    }
+    curshdr=0;
 }
 
 void ofApp::rndrcam(ofPixelsRef & pixelsRef){
-    ofSetColor(255,255,255,ofMap(mouseX,0,ofGetWidth(),0,255));
-    float px = ofGetWidth()/2 - camw/2;
-    float py = ofGetHeight()/2 - camh/2;
-    vdo.draw(px,py);
-    // ascii scan-line overlay (otherwise it slows down audio)
-    ofSetHexColor(0xffd700);
-    for (int i = 0; i < camw; i+= 6){
-        float lightness = pixelsRef.getColor(i,camj).getLightness();
-        int c = powf(ofMap(lightness, 0, 255, 0, 1), 2.75) * asciiChars.size();
-        camfnt.drawString(ofToString(asciiChars[c]), px+i, py+camj);
-    }
-    camj=(camj+8)%camh;
+    vdo.getTexture().bind();
+    int curshdrcopy=curshdr;
+    shdr[curshdrcopy].begin();
+    //
+    shdr[curshdrcopy].setUniform1f("u_time", t);
+    shdr[curshdrcopy].setUniform2f("u_res", ofGetWidth(), ofGetHeight());
+    ofPushMatrix();
+    ofTranslate(ofGetWidth()/2,ofGetHeight()/2);
+    ofRotateRad(PI);
+    plane.draw();
+    ofPopMatrix();
+    //
+    shdr[curshdrcopy].end();
+    vdo.getTexture().unbind();
 }
 
 void ofApp::setup(){
-    ofSetWindowTitle("amUrtayantra"); // amUrtayantra it is!
+    ofSetWindowTitle("amUrtayantra"); // amUrtayantra it is! although fullscreen ensures you'll never see the name
     ofSetVerticalSync(true);
     ofBackground(0,0,0);
 
@@ -673,6 +699,7 @@ void ofApp::setup(){
     initvm();
     initsynth();
     initlogo();
+    initshdr();
     initcam();
 
     fnt.load("OCRA",14,true,true);
@@ -701,6 +728,8 @@ void ofApp::update(){
 
     // cam update
     vdo.update();
+    // the passage of time
+    t+=dt;
 }
 
 //--------------------------------------------------------------
@@ -958,8 +987,9 @@ void ofApp::trtlwalk(){
 }
 
 void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
+    // shadercam
+    rndrcam(pixelsRef);
     for(int i=0;i<times;i++){
-        ofBackground(0,0,0);
         ofSetColor(0,240,0);
         // monophonic key sweeping
         kbsweep();
@@ -970,8 +1000,6 @@ void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
         rndrlfos(ofGetWidth()*0.66,144);
         // logo
         trtlwalk();
-        // asciicam
-        rndrcam(pixelsRef);
         // oscope
         ofSetColor(0,240,0);
         ofSetLineWidth(1 + (rms * 30.));
@@ -1000,6 +1028,8 @@ void ofApp::loadprogram(int pid){
     }
     ec=0;
     pc=0;
+    // shader select
+    curshdr=pid%NGLSL;
     return;
 }
 
@@ -1012,7 +1042,9 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     int tmp;
-    cout<<key<<endl;
+    if(DEBUG){
+        cout<<key<<endl;
+    }
     if(key==1)    return;
     if(key==2)    return;
     if(key==4)    return;
