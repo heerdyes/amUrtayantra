@@ -702,6 +702,7 @@ void ofApp::initshdr(){
         shdr[5].load("gl3/vdofx");
         shdr[6].load("gl3/madkam");
         shdr[7].load("gl3/tmp");
+        shdr[8].load("gl3/dimensionwarp");
     }else{
         shdr[0].load("gl2/hypnorgb");
         shdr[1].load("gl2/lips");
@@ -711,6 +712,7 @@ void ofApp::initshdr(){
         shdr[5].load("gl2/vdofx");
         shdr[6].load("gl2/madkam");
         shdr[7].load("gl2/tmp");
+        shdr[8].load("gl2/dimensionwarp");
     }
     curshdr=0;
 }

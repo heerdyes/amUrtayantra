@@ -4,7 +4,8 @@ uniform sampler2D tex0;
 uniform float u_time;
 uniform vec2 u_res;
 
-varying vec2 texCoordVarying;
+in vec2 texCoordVarying;
+out vec4 outputColor;
 
 void main() {
   vec2 st = gl_FragCoord.xy / u_res;
@@ -17,11 +18,12 @@ void main() {
   float dy = (1.0 / ar) * abs(st.y - cy);
   float d = sqrt(pow(dx, 2.0) + pow(dy, 2.0));
   //
-  float kc=0.70 + 0.02*sin(2.0 * pi * 0.224 * u_time);
+  float kc=0.60 + 0.05*sin(2.0 * pi * 0.224 * u_time);
   //
-  vec4 cam=texture2D(tex0, texCoordVarying/u_res);
-  float p=0.5+0.5*sin(pi*d*u_time*cam.y);
-  vec4 recam=vec4(p, dy*cam.x, cam.z, cam.w);
+  vec4 cam=texture(tex0, texCoordVarying/u_res);
+  float mahou=sin(2.0*pi*cam.x*cam.y*u_time * d);
+  float hypnote=log(1.0+2*dx*dy);
+  vec4 recam=vec4(mahou, cam.y, hypnote, cam.w);
   //
-  gl_FragColor = recam*kc;
+  outputColor = recam*kc;
 }
