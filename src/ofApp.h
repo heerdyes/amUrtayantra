@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 18
+#define NPRGMS 19
 #define NHARM 8
 
 #define SMPLRATE 44100
@@ -20,7 +20,7 @@
 #define NBUF 4
 #define NOUTCH 2
 #define SPDLIM 4
-#define NGLSL 7
+#define NGLSL 8
 
 class trtl{
 public:
@@ -616,6 +616,7 @@ class ofApp : public ofBaseApp{
 		void xmod();
 		void clrmodmat();
 		void loadprogram(int pid);
+		void loadshader(int pid);
 		void initlogo();
 		void trtlwalk();
 		void initcam();
@@ -700,7 +701,9 @@ class ofApp : public ofBaseApp{
 
 			"mejxVz4cs3 h31iqonocigf2eza1ng0 =r0u c-dX62Sr033 c c `04i0Zx0d1 x10160wx80 `14i1ox1e1.........",
 			"mmj0q,n,g0c75c93h26if6^j%jzicnpcrjvr%rm6cz. c;i `02i00 p0,c7( x0d156zte8820 =P09 cQ% x14163mz.",
-			"mjnog0 i00cJ9p0oc3f `01fa 34  qoc3vj0 cA,eak20 ==05h2 r/030 c\\*e6r20 =I05 x04157 8 x1d164l7..."
+			"mjnog0 i00cJ9p0oc3f `01fa 34  qoc3vj0 cA,eak20 ==05h2 r/030 c\\*e6r20 =I05 x04157 8 x1d164l7...",
+
+			" x041x151550s630hn,g0P,cimI0/020ckt cvrm,~1fa 10t11t12t13s14s15s16s17s18sA61cR] x2f1x2g1x2i1..."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";

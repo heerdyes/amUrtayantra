@@ -275,7 +275,7 @@ void ofApp::cyclevm(){
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
-            if(arg1!=-1&&arg2!=-1){
+            if(arg1!=-1){
                 pc=arg1;
             }
             break;
@@ -701,6 +701,7 @@ void ofApp::initshdr(){
         shdr[4].load("gl3/trigonomagnetism");
         shdr[5].load("gl3/vdofx");
         shdr[6].load("gl3/madkam");
+        shdr[7].load("gl3/tmp");
     }else{
         shdr[0].load("gl2/hypnorgb");
         shdr[1].load("gl2/lips");
@@ -709,6 +710,7 @@ void ofApp::initshdr(){
         shdr[4].load("gl2/trigonomagnetism");
         shdr[5].load("gl2/vdofx");
         shdr[6].load("gl2/madkam");
+        shdr[7].load("gl2/tmp");
     }
     curshdr=0;
 }
@@ -1071,9 +1073,15 @@ void ofApp::loadprogram(int pid){
     }
     ec=0;
     pc=0;
+}
+
+void ofApp::loadshader(int pid){
+    if(pid<0){
+        cout<<"shader #"<<pid<<" unavailable!\n";
+        return;
+    }
     // shader select
     curshdr=pid%NGLSL;
-    return;
 }
 
 //--------------------------------------------------------------
@@ -1184,12 +1192,27 @@ void ofApp::keyPressed(int key){
         loadprogram(key-97+10);
         return;
     }
-    if(key==114&&ladown){
+    // shader memory [0-9] check glsl
+    if(key>=48&&key<=57&&lcdown){
+        loadshader(key-48);
+        return;
+    }
+    // extended shader memory [a-z] :D
+    if(key>=97&&key<=122&&lcdown){
+        loadshader(key-97+10);
+        return;
+    }
+    if(key==114&&ladown){ // alt+r -> randomly constituted program
         clrmodmat();
         for(int i=0;i<MEMLEN;i++){
             int idx=(int)ofRandom(0,1024);
             M[i]=AB[idx%MEMLEN];
         }
+        return;
+    }
+    // time reset
+    if(key==32&&lcdown){ // ctrl+space
+        t=0.0;
         return;
     }
     M[ec]=key;
