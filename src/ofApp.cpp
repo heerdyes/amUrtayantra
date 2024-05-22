@@ -649,8 +649,8 @@ void ofApp::initsynth(){
     //
     rootflo=40.0;
     rootfhi=80.0;
-    tunlo=-3.0;
-    tunhi=3.0;
+    tunlo=-7.0;
+    tunhi=7.0;
     activenote=0;
     notevelo=0;
     // osc gains
