@@ -1,16 +1,33 @@
 #include "ofApp.h"
 
 void ofApp::setupyc(){
-    ycfd=shm_open(reface, O_RDWR, 0644);
-    fprintf(stderr, "[shm] ycfd: %d\n", ycfd);
-    if(ycfd>0){
+    kbfd=shm_open(reface, O_RDWR, 0644);
+    fprintf(stderr, "[shm][yc] fd: %d\n", kbfd);
+    if(kbfd>0){
         struct stat sby;
-        fstat(ycfd,&sby);
-        yclen=sby.st_size;
-        yc=(u_char *)mmap(NULL, yclen, PROT_READ|PROT_WRITE, MAP_SHARED, ycfd, 0);
-        fprintf(stderr, "[shm] addr: %p [0..%lu]\n", yc, yclen-1);
-        if(yc){
+        fstat(kbfd,&sby);
+        kblen=sby.st_size;
+        kb=(u_char *)mmap(NULL, kblen, PROT_READ|PROT_WRITE, MAP_SHARED, kbfd, 0);
+        fprintf(stderr, "[shm] addr: %p [0..%lu]\n", kb, kblen-1);
+        if(kb){
             cout<<"[yc] all in order.\n";
+        }else{
+            cout<<"[error] the end is here!\n";
+        }
+    }
+}
+
+void ofApp::setupdm(){
+    kbfd=shm_open(deepmind, O_RDWR, 0644);
+    fprintf(stderr, "[shm][dm] fd: %d\n", kbfd);
+    if(kbfd>0){
+        struct stat sby;
+        fstat(kbfd,&sby);
+        kblen=sby.st_size;
+        kb=(u_char *)mmap(NULL, kblen, PROT_READ|PROT_WRITE, MAP_SHARED, kbfd, 0);
+        fprintf(stderr, "[shm] addr: %p [0..%lu]\n", kb, kblen-1);
+        if(kb){
+            cout<<"[dm] all in order.\n";
         }else{
             cout<<"[error] the end is here!\n";
         }
@@ -718,7 +735,9 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofBackground(0,0,0);
 
-    setupyc();
+    // use only one kbd at a time!
+    // setupyc(); // yamaha reface yc
+    setupdm();    // behringer deepmind 12
     setupsndsys();
     initvm();
     initsynth();
@@ -869,7 +888,7 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
 
 //--------------------------------------------------------------
 void ofApp::exit(){
-    close(ycfd);
+    close(kbfd);
 }
 
 void ofApp::rndrmem(float y){
@@ -899,13 +918,13 @@ void ofApp::rndrmem(float y){
     }
 }
 
-void ofApp::rndryc(float y){
+void ofApp::rndrkb(float y){
     int d=0;
     float w=20,h=200;
-    float x=(ofGetWidth()-w*(yclen-1))/2;
+    float x=(ofGetWidth()-w*(kblen-1))/2;
     ofNoFill();
-    for(int i=0;i<yclen-1;i++,d++){
-        float v=ofMap(yc[i],0,127,0.,h);
+    for(int i=0;i<kblen-1;i++,d++){
+        float v=ofMap(kb[i],0,127,0.,h);
         ofDrawLine(x+d*w,y+h-v,x+(d+1)*w,y+h-v);
     }
 }
@@ -987,10 +1006,10 @@ void ofApp::rndrmodmat(float x,float y){
 
 void ofApp::kbsweep(){
     int somenoteon=0;
-    for(int i=0;i<yclen;i++){
-        if(yc[i]>0){
+    for(int i=0;i<kblen;i++){
+        if(kb[i]>0){
             activenote=i;
-            notevelo=yc[i];
+            notevelo=kb[i];
             somenoteon=1;
             break;
         }
@@ -1018,7 +1037,7 @@ void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
         // monophonic key sweeping
         kbsweep();
         // rndr
-        rndryc(ofGetHeight()-200-30);
+        rndrkb(ofGetHeight()-200-30);
         rndrmem(y);
         rndrmodmat(112,170);
         rndrlfos(ofGetWidth()*0.66,144);
