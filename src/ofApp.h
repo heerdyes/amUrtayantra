@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#define MEMLEN 94
+#define MEMLEN 95
 #define NHUES 33
 #define NWAVS 5
 #define NLFOWAVS 2
