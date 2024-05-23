@@ -12,8 +12,9 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 20
-#define NHARM 8
+#define NPRGMS 22
+#define NHARM 64
+#define NCOEFF 4
 
 #define SMPLRATE 44100
 #define BUFSZ 512
@@ -490,15 +491,19 @@ public:
 		kF=kf;
 		kG=kg;
 		hx=new syn*[nhx];
+		for(int i=0;i<NCOEFF;i++){
+			rot[i]=0;
+			vol[i]=MEMLEN-1;
+		}
 		for(int i=0;i<nhx;i++){
-			hx[i]=new syn(40.,0.);
+			float fi=F+i*rot[i%NCOEFF];
+			float gi=(1.0/(float)NHARM) * ((float)vol[i%NCOEFF] / (float)MEMLEN);
+			hx[i]=new syn(fi,gi);
 		}
 		for(int i=0;i<BUFSZ;i++){
 			buf[i]=0.;
 		}
 		uctr=0;
-		sethxfreq();
-		sethxgain();
 		y=0.;
 		yy=0.;
 	}
@@ -514,19 +519,12 @@ public:
 		uctr=(uctr+1)%BUFSZ;
 	}
 
-	void sethxfreq(){
-		float facc=F;
+	void sethxfreqgain(){
 		for(int i=0;i<nhx;i++){
-			hx[i]->command(0, facc);
-			facc*=kF;
-		}
-	}
-
-	void sethxgain(){
-		float gacc=1.;
-		for(int i=0;i<nhx;i++){
-			hx[i]->command(1, gacc);
-			gacc*=kG;
+			float fi=F+i*rot[i%NCOEFF];
+			float gi=(1.0/(float)NHARM) * ((float)vol[i%NCOEFF] / (float)MEMLEN);
+			hx[i]->command(0, fi);
+			hx[i]->command(1, gi);
 		}
 	}
 
@@ -535,23 +533,28 @@ public:
 			case 0:
 				F=cv<33?33:cv;
 				Fref=F;
-				sethxfreq();
+				sethxfreqgain();
 				break;
 			case 1:
 				G=cv>1?1:(cv<0?0:cv);
 				Gref=G;
 				break;
-			case 2:
-				kF=cv;
-				sethxfreq();
-				break;
-			case 3:
-				kG=cv;
-				sethxgain();
-				break;
 		}
 	}
 
+	void setrot(int pos,int vlu){
+		if(pos>0&&pos<NCOEFF){
+			rot[pos]=vlu;
+		}
+	}
+
+	void setvol(int pos,int vlu){
+		if(pos>0&&pos<NCOEFF){
+			vol[pos]=vlu;
+		}
+	}
+
+	// modulation not yet activated
 	void modulate(int mc, float mv){
 		float tmp;
 		switch(mc){
@@ -572,6 +575,8 @@ public:
 	float kF,kG;
 	syn ** hx;
 	float buf[BUFSZ];
+	int rot[NCOEFF];
+	int vol[NCOEFF];
 };
 
 class ofApp : public ofBaseApp{
@@ -644,7 +649,7 @@ class ofApp : public ofBaseApp{
 		float rootflo,rootfhi;
 		float gain[NOSCS];
 		float gainhi,gainlo;
-		float hxgainlim;
+		float hxgainlim,hxgain;
 		float mgain;
 		float mglo,mghi;
 		// natural (just) scale tuning
@@ -705,7 +710,10 @@ class ofApp : public ofBaseApp{
 			"mJnog0 i00cJ9p0oc3f `01fa 34  qoc3vj0 cA,eak20 ==05h2 r/030 c\\*e6r20 =I05 x04157 8 x1d164l7...",
 
 			" x041x151550s630hn,g0P,cimI0/020ckt cvrm,~1fa 10t11t12t13s14s15s16s17s18sA61cR] x2f1x2g1x2i1...",
-			"^\\p\\0c13e4520cc4i\\0c1hf2`\\3c1pcciAZp/p%0 cz. =b0;rdlf x0f1c$*5a0r.............................."
+			"^\\p\\0c13e4520cc4i\\0c1hf2`\\3c1pcciAZp/p%0 cz. =b0;rdlf x0f1c$*5a0r..............................",
+			"j0mZk16g7g0ca1A91V66cg5cj6rgmgct7^4>y8L/L97 c/' c]8nz/z1z c$^qzc*Efae590 =N0a.................",
+
+			"nog0j0c35mMqoc1ck1y23^=>m4d/d91cqscuhVf0-z0y c;] c-i i00c3&`02f8 p0oc1J x04153 r x0e1i10c3:`14."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
