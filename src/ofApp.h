@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 19
+#define NPRGMS 20
 #define NHARM 8
 
 #define SMPLRATE 44100
@@ -644,6 +644,7 @@ class ofApp : public ofBaseApp{
 		float rootflo,rootfhi;
 		float gain[NOSCS];
 		float gainhi,gainlo;
+		float hxgainlim;
 		float mgain;
 		float mglo,mghi;
 		// natural (just) scale tuning
@@ -679,17 +680,17 @@ class ofApp : public ofBaseApp{
 		// programs (patches) [0-9]
 		// sooner or later these are going to go into a file ;-P
 		string prgms[NPRGMS]={
-			"n,vQg0 =3,5c19 P,c3nmd!Q~2 c1gfae4520 =z05I0 c,-..............................................",
-			"mAI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2...................................",
+			"^q1qDc13iq0g0c19ccanopqoc1mcknfa`q3 c1x 39N 3aSmM..............................................",
+			"mHI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2...................................",
 			"raZLPLc35I0mZ~3f4z806Azc 16cckqcnrntg0 c.a....................................................",
 
-			"AZ[#2|%#6|H#a|T i00i10i20i30p0'p1$p2Gp3Sc2uc6xca,ce;nvg0 c&ic&lc&oc&rf4 mf...................c",
-			"m.p0Ii00`01raZIce4 x0d150arg0csocs7 i1r`14 x1e1617c...........................................",
+			"AZ[#2|%#6|H#a|T i00i10i20i30p0'p1$p2Gp3Sc2uc6xca,ce;nvg0 c&ic&lc&oc&rf4 mM...................c",
+			"mMp0Ii00`01raZIce4 x0d150arg0csocs7 i1r`14 x1e1617c...........................................",
 			"n,g0r020#17,p0,cbei0.m.`03i1p10s11rp1.cb.i20`24 c3-f8Vc7 x041570zc&EAh1.......................",
 
-			"x141i00mg`02i10`13630en,g0p0,cnsfa cp6 x051500Z cpep1, cn% /020cpC cE=`24 i2g x3f1............",
-			"600r x101 x0d1`04i0mmhi10i20nvg0 c;1/020cv.71nv `12i1zp1vc`* `22i2dp2BraZBcPL.................",
-			"^? i0omm p0[n[cdb `0>c1kf4 x0d150)z x10160_u i10`13p1[cd%e5a20g0 =C0F/020 cDM cO  x151........",
+			"x141i00mG`02i10`13630en,g0p0,cnsfa cp6 x051500Z cpep1, cn% /020cpC cE=`24 i2g x3f1............",
+			"600r x101 x0d1`04i0mmHi10i20nvg0 c;1/020cv.71nv `12i1zp1vc`* `22i2dp2BraZBcPL.................",
+			"^? i0omM p0[n[cdb `0>c1kf4 x0d150)z x10160_u i10`13p1[cd%e5a20g0 =C0F/020 cDM cO  x151........",
 
 			"g0/020c13/020c5ai00i10i20c1ic5lccop0tp1[p2%nt#=|[#)|% c=,c);c$]`03`13`23mmfb10p11p12p........c",
 			"n,g0mhf5B............................V85+,c)c1[A81p1)c!#c-$i10c!C/030c3IcKD`11c!Sb;...........",
@@ -699,11 +700,12 @@ class ofApp : public ofBaseApp{
 			"A82%251c24`21c2bc6ci20c2km9p2xc2snx cyte6920g0 =]0\\ c-lf7rrtt12t cCFc2E.......................",
 			"m,q,n,c53Vi8ci1Xb|w h16 Va5c.mf5g0#xq5j0g0/030 c[- c\\;.......................................4",
 
-			"mejxVz4cs3 h31iqonocigf2eza1ng0 =r0u c-dX62Sr033 c c `04i0Zx0d1 x10160wx80 `14i1ox1e1.........",
-			"mmj0q,n,g0c75c93h26if6^j%jzicnpcrjvr%rm6cz. c;i `02i00 p0,c7( x0d156zte8820 =P09 cQ% x14163mz.",
-			"mjnog0 i00cJ9p0oc3f `01fa 34  qoc3vj0 cA,eak20 ==05h2 r/030 c\\*e6r20 =I05 x04157 8 x1d164l7...",
+			"mMjxVz4cs3 h31iqonocigf2eza1ng0 =r0u c-dX62Sr033 c c `04i0Zx0d1 x10160wx80 `14i1ox1e1.........",
+			"mMj0q,n,g0c75c93h26if6^j%jzicnpcrjvr%rm6cz. c;i `02i00 p0,c7( x0d156zte8820 =P09 cQ% x14163mz.",
+			"mJnog0 i00cJ9p0oc3f `01fa 34  qoc3vj0 cA,eak20 ==05h2 r/030 c\\*e6r20 =I05 x04157 8 x1d164l7...",
 
-			" x041x151550s630hn,g0P,cimI0/020ckt cvrm,~1fa 10t11t12t13s14s15s16s17s18sA61cR] x2f1x2g1x2i1..."
+			" x041x151550s630hn,g0P,cimI0/020ckt cvrm,~1fa 10t11t12t13s14s15s16s17s18sA61cR] x2f1x2g1x2i1...",
+			"^\\p\\0c13e4520cc4i\\0c1hf2`\\3c1pcciAZp/p%0 cz. =b0;rdlf x0f1c$*5a0r.............................."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
@@ -736,7 +738,7 @@ class ofApp : public ofBaseApp{
 
 		// asciicam
 		ofVideoGrabber vdo;
-		int camw,camh,camj=0;
+		int camw,camh;
 		string asciiChars;
 		ofTrueTypeFont camfnt;
 

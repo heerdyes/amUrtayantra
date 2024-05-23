@@ -93,7 +93,8 @@ void ofApp::cyclevm(){
         case 'g':
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
-            M[pc]=AB[floor(ofMap(notevelo,0,127,0,MEMLEN))];
+            r0=((float)notevelo / 128.) * (float)MEMLEN;
+            M[pc]=AB[floor(r0)];
             pc=(pc+1)%MEMLEN;
             break;
         case '^': // ramp up wraparound
@@ -625,7 +626,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
-                hxs->command(1,ofMap(arg1,0,MEMLEN,0.,1.));
+                hxs->command(1,ofMap(arg1,0,MEMLEN,0.,hxgainlim));
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -671,11 +672,15 @@ void ofApp::initsynth(){
     activenote=0;
     notevelo=0;
     // osc gains
-    gainhi=0.95;
+    gainhi=1.0/NOSCS;
+    cout<<"[initsynth] per-osc gain limit = "<<gainhi<<endl;
     gainlo=0.00;
     mgain=0.0;
     mglo=0.00;
-    mghi=0.75;
+    mghi=0.95;
+    cout<<"[initsynth] master gain limit = "<<mghi<<endl;
+    hxgainlim=1.0/NHARM;
+    cout<<"[initsynth] harmonix gain limit = "<<hxgainlim<<endl;
 }
 
 void ofApp::initcam(){
