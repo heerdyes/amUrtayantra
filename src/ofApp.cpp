@@ -597,19 +597,28 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'h': // harmonix timbre
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            pc=(pc+1)%MEMLEN;
-            arg2=AB.find(M[pc]); // <arg1>.<arg2> frequency ratio is fractional
-            pc=(pc+1)%MEMLEN;
-            arg3=AB.find(M[pc]); // .<arg3> gain ratio < 1
-            if(arg1!=-1&&arg2!=-1&&arg3!=-1){
-                r0=(float)arg1+ofMap(arg2,0,MEMLEN,0.,1.);
-                hxs->command(2,r0);
-                hxs->command(3,ofMap(arg3,0,MEMLEN,0.,1.));
+        case 'k': // harmonix rot/koefficient array: NCOEFF params
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,(1+NCOEFF)*cw-3,ch+5);
+            for(int i=0;i<NCOEFF;i++){
+                pc=(pc+1)%MEMLEN;
+                arg1=AB.find(M[pc]);
+                if(arg1!=-1){
+                    hxs->setrot(i,arg1);
+                }
             }
+            hxs->sethxfreqgain();
+            pc=(pc+1)%MEMLEN;
+            break;
+        case 'w': // harmonix vol/weight array: NCOEFF params
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,(1+NCOEFF)*cw-3,ch+5);
+            for(int i=0;i<NCOEFF;i++){
+                pc=(pc+1)%MEMLEN;
+                arg1=AB.find(M[pc]);
+                if(arg1!=-1){
+                    hxs->setvol(i,arg1);
+                }
+            }
+            hxs->sethxfreqgain();
             pc=(pc+1)%MEMLEN;
             break;
         case 'q': // harmonix note: q <notenum>
@@ -679,7 +688,8 @@ void ofApp::initsynth(){
     mglo=0.00;
     mghi=0.95;
     cout<<"[initsynth] master gain limit = "<<mghi<<endl;
-    hxgainlim=1.0/NHARM;
+    hxgainlim=0.50;
+    hxgain=hxgainlim;
     cout<<"[initsynth] harmonix gain limit = "<<hxgainlim<<endl;
 }
 
@@ -745,7 +755,7 @@ void ofApp::setup(){
     ofBackground(0,0,0);
 
     // use only one kbd at a time!
-    // setupyc(); // yamaha reface yc
+    //setupyc(); // yamaha reface yc
     setupdm();    // behringer deepmind 12
     setupsndsys();
     initvm();
@@ -868,7 +878,7 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
         for(int i=0;i<NOSCS;i++){
             mix += gain[i] * w[i][wtyp[i]]->y;
         }
-        mix += hxs->buf[i]; // hx synth
+        mix += hxgain * hxs->buf[i]; // hx synth
 		float lmono=mgain*mix;
         // guards
 		if(lmono>0.99){
