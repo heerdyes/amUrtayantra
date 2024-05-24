@@ -703,19 +703,19 @@ class ofApp : public ofBaseApp{
 
 			"n&g0v2X5|4p36c5bc9ci30c5km5e3620 =u03 cvlf4`33 c5=r093 c%\\ x041555Z..........................2",
 			"A82%251c24`21c2bc6ci20c2km9p2xc2snx cyte6920g0 =]0\\ c-lf7rrtt12t cCFc2E.......................",
-			"m,q,n,c53Vi8ci1Xb|w h16 Va5c.mf5g0#xq5j0g0/030 c[- c\\;.......................................4",
+			"n,g0j0mTc.5q,c1cf6k1839wI%C=^=ctre9620 =,03>t4C c`q<t6% c^pXt~\">E3I cIo>ta8 cQk<t83 cYl.......2",
 
-			"mMjxVz4cs3 h31iqonocigf2eza1ng0 =r0u c-dX62Sr033 c c `04i0Zx0d1 x10160wx80 `14i1ox1e1.........",
 			"mMj0q,n,g0c75c93h26if6^j%jzicnpcrjvr%rm6cz. c;i `02i00 p0,c7( x0d156zte8820 =P09 cQ% x14163mz.",
-			"mJnog0 i00cJ9p0oc3f `01fa 34  qoc3vj0 cA,eak20 ==05h2 r/030 c\\*e6r20 =I05 x04157 8 x1d164l7...",
-
 			" x041x151550s630hn,g0P,cimI0/020ckt cvrm,~1fa 10t11t12t13s14s15s16s17s18sA61cR] x2f1x2g1x2i1...",
 			"^\\p\\0c13e4520cc4i\\0c1hf2`\\3c1pcciAZp/p%0 cz. =b0;rdlf x0f1c$*5a0r..............................",
-			"j0mZk16g7g0ca1A91V66cg5cj6rgmgct7^4>y8L/L97 c/' c]8nz/z1z c$^qzc*Efae590 =N0a.................",
 
+			"j0mZk16g7g0ca1A91V66cg5cj6rgmgct7^4>y8L/L97 c/' c]8nz/z1z c$^qzc*Efae590 =N0a.................",
 			"nog0j0c35mMqoc1ck1y23^=>m4d/d91cqscuhVf0-z0y c;] c-i i00c3&`02f8 p0oc1J x04153 r x0e1i10c3:`14.",
 			"n)g0j0mZk336jq)c1eAe7c35w=fIj#k~]f6Aa2>.8f%f43 c[- c\\9Vg9<*f6%686 cCE cGb.....................z",
-			"k1360j0mJg0c 6qonochfJZf4Aaa>rdu%uf0 cvxcz4ea620 =`0a.........................................."
+
+			"k1360j0mJg0c 6qonochfJZf4Aaa>rdu%uf0 cvxcz4ea620 =`0a..........................................",
+			"k1364j0mJg0c 6q[n[chfJZf4Aa9>rdG%Gf4 cvxcz4ea620 =`0a i00`04p0[chE ca* x0d1553tVa5 cXS.........",
+			"..............................................................................................."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
