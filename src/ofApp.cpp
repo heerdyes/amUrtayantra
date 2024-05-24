@@ -635,7 +635,16 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
-                hxs->command(1,ofMap(arg1,0,MEMLEN,0.,hxgainlim));
+                hxs->command(1,ofMap(arg1,0,MEMLEN,0.,1.));
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
+        case 'J': // harmonix main gain
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            if(arg1!=-1){
+                hxgain=ofMap(arg1,0,MEMLEN,0.,hxgainlim);
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -688,8 +697,8 @@ void ofApp::initsynth(){
     mglo=0.00;
     mghi=0.95;
     cout<<"[initsynth] master gain limit = "<<mghi<<endl;
-    hxgainlim=0.50;
-    hxgain=hxgainlim;
+    hxgainlim=0.94;
+    hxgain=0.66*hxgainlim;
     cout<<"[initsynth] harmonix gain limit = "<<hxgainlim<<endl;
 }
 
@@ -755,8 +764,8 @@ void ofApp::setup(){
     ofBackground(0,0,0);
 
     // use only one kbd at a time!
-    //setupyc(); // yamaha reface yc
-    setupdm();    // behringer deepmind 12
+    setupyc(); // yamaha reface yc
+    //setupdm();    // behringer deepmind 12
     setupsndsys();
     initvm();
     initsynth();

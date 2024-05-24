@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 22
+#define NPRGMS 24
 #define NHARM 64
 #define NCOEFF 4
 
@@ -543,13 +543,13 @@ public:
 	}
 
 	void setrot(int pos,int vlu){
-		if(pos>0&&pos<NCOEFF){
+		if(pos>=0&&pos<NCOEFF){
 			rot[pos]=vlu;
 		}
 	}
 
 	void setvol(int pos,int vlu){
-		if(pos>0&&pos<NCOEFF){
+		if(pos>=0&&pos<NCOEFF){
 			vol[pos]=vlu;
 		}
 	}
@@ -713,7 +713,9 @@ class ofApp : public ofBaseApp{
 			"^\\p\\0c13e4520cc4i\\0c1hf2`\\3c1pcciAZp/p%0 cz. =b0;rdlf x0f1c$*5a0r..............................",
 			"j0mZk16g7g0ca1A91V66cg5cj6rgmgct7^4>y8L/L97 c/' c]8nz/z1z c$^qzc*Efae590 =N0a.................",
 
-			"nog0j0c35mMqoc1ck1y23^=>m4d/d91cqscuhVf0-z0y c;] c-i i00c3&`02f8 p0oc1J x04153 r x0e1i10c3:`14."
+			"nog0j0c35mMqoc1ck1y23^=>m4d/d91cqscuhVf0-z0y c;] c-i i00c3&`02f8 p0oc1J x04153 r x0e1i10c3:`14.",
+			"n)g0j0mZk336jq)c1eAe7c35w=fIj#k~]f6Aa2>.8f%f43 c[- c\\9Vg9<*f6%686 cCE cGb.....................z",
+			"k1360j0mJg0c 6qonochfJZf4Aaa>rdu%uf0 cvxcz4ea620 =`0a.........................................."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
