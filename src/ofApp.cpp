@@ -79,7 +79,7 @@ void ofApp::cyclevm(){
     char code=M[pc];
     int pos,src,dst,xpc,arg1,arg2,arg3,arg4;
     int ma1,ma2;
-    float hh,r0,cw=18.,ch=20.;
+    float hh,r0,cw=16.,ch=20.;
     switch(code){
         case '.':
             pc=0;
@@ -773,7 +773,7 @@ void ofApp::setup(){
     initshdr();
     initcam();
 
-    fnt.load("OCRA",14,true,true);
+    fnt.load("OCRA",12,true,true);
 }
 
 //--------------------------------------------------------------
@@ -923,7 +923,7 @@ void ofApp::rndrmem(float y){
     ofSetColor(0,230,0);
     char q[2];
     float d=6;
-    float cw=18.,ch=20.;
+    float cw=16.,ch=20.;
     vmx=(ofGetWidth()-MEMLEN*cw)/2.;
     float x=vmx;
     for(int i=0;i<MEMLEN;i++){
@@ -991,7 +991,7 @@ void ofApp::rndrlfos(float x,float y){
 // [TODO] enable weights for mod matrix
 void ofApp::rndrmodmat(float x,float y){
     ofSetColor(23,202,232);
-    float cw=22,ch=24;
+    float cw=18,ch=24;
     char s[3];
     fnt.drawString("src",x,y+ch);
     fnt.drawString("dst",x+cw,y);
