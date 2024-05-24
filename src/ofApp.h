@@ -12,7 +12,7 @@
 #define NOSCS 9
 #define MMROWS 4
 #define MMCOLS 22
-#define NPRGMS 24
+#define NPRGMS 27
 #define NHARM 64
 #define NCOEFF 4
 
@@ -715,7 +715,11 @@ class ofApp : public ofBaseApp{
 
 			"k1360j0mJg0c 6qonochfJZf4Aaa>rdu%uf0 cvxcz4ea620 =`0a..........................................",
 			"k1364j0mJg0c 6q[n[chfJZf4Aa9>rdG%Gf4 cvxcz4ea620 =`0a i00`04p0[chE ca* x0d1553tVa5 cXS.........",
-			"n-g0mF B.vb>a5( ce\\w~~B~^B cpm BA....j0c3/k14(bq-c1)B9....`01i00c3Fp0-c1Lf8 x0d1585tx101606r..."
+			"n-g0mF B.vb>a5( ce\\w~~B~^B cpm BA....j0c3/k14(bq-c1)B9....`01i00c3Fp0-c1Lf8 x0d1585tx101606r...",
+
+			"n,g0j0k>>>>cn5q,c1fea620=m03f3wB>``^TX,~B c'vm"J"<,2> c$w<,4> cC7cC8cC9cCa....................2",
+			"nqg0j0kMOMMcn5qqc1fea620=m03f3ww&``^gX,~w c'vm"J"<,2& c$w<,4M cC7#C~OcK8#C3McR9#CnMcYa........2",
+			"nrg0j0kz#^&cn5qrc1fea620=m03f3w(W``^SX,~( c'vm"J"<,2W c$w<,4z cC7#C2#cK8#C4^cR9#C6&cYa........2"
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
