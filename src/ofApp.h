@@ -715,7 +715,7 @@ class ofApp : public ofBaseApp{
 
 			"k1360j0mJg0c 6qonochfJZf4Aaa>rdu%uf0 cvxcz4ea620 =`0a..........................................",
 			"k1364j0mJg0c 6q[n[chfJZf4Aa9>rdG%Gf4 cvxcz4ea620 =`0a i00`04p0[chE ca* x0d1553tVa5 cXS.........",
-			"..............................................................................................."
+			"n-g0mF B.vb>a5( ce\\w~~B~^B cpm BA....j0c3/k14(bq-c1)B9....`01i00c3Fp0-c1Lf8 x0d1585tx101606r..."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";

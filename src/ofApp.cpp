@@ -764,8 +764,8 @@ void ofApp::setup(){
     ofBackground(0,0,0);
 
     // use only one kbd at a time!
-    setupyc();    // yamaha reface yc
-    //setupdm();    // behringer deepmind 12
+    //setupyc();    // yamaha reface yc
+    setupdm();    // behringer deepmind 12
     setupsndsys();
     initvm();
     initsynth();
