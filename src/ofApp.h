@@ -8,13 +8,14 @@
 #define MEMLEN 95
 #define NHUES 33
 #define NWAVS 5
-#define NLFOWAVS 2
 #define NOSCS 9
+#define NLFOWAVS 2
 #define MMROWS 4
-#define MMCOLS 22
+#define MMCOLS 6
 #define NPRGMS 27
 #define NHARM 64
 #define NCOEFF 4
+#define MAXNOTES 88
 
 #define SMPLRATE 44100
 #define BUFSZ 512
@@ -484,12 +485,12 @@ public:
 // harmonic series synth
 class hxsyn {
 public:
-	hxsyn(int n, float f, float g, float kf, float kg) {
+	hxsyn(int n, float f, float g) {
 		nhx=n;
 		F=f;
 		G=g;
-		kF=kf;
-		kG=kg;
+		Fref=f;
+		Gref=g;
 		hx=new syn*[nhx];
 		for(int i=0;i<NCOEFF;i++){
 			rot[i]=0;
@@ -554,7 +555,7 @@ public:
 		}
 	}
 
-	// modulation not yet activated
+	// modulation now under test
 	void modulate(int mc, float mv){
 		float tmp;
 		switch(mc){
@@ -571,8 +572,8 @@ public:
 
 	float yy,y;
 	int nhx,uctr;
-	float G,F,Gref,Fref;
-	float kF,kG;
+	float G,F;
+	float Fref,Gref;
 	syn ** hx;
 	float buf[BUFSZ];
 	int rot[NCOEFF];
@@ -636,19 +637,14 @@ class ofApp : public ofBaseApp{
 		float rms;
 
 		// synth
-		phasor * w[NOSCS][NWAVS];
 		lfo * lfo1[NLFOWAVS];
 		lfo * lfo2[NLFOWAVS];
 		vector<float> lfo1scope;
 		vector<float> lfo2scope;
 		int lfobufsz;
 		int lfoctr;
-		int wtyp[NOSCS];
 		int lfo1typ,lfo2typ;
-		float rootf[NOSCS];
 		float rootflo,rootfhi;
-		float gain[NOSCS];
-		float gainhi,gainlo;
 		float hxgainlim,hxgain;
 		float mgain;
 		float mglo,mghi;
@@ -658,16 +654,15 @@ class ofApp : public ofBaseApp{
 		float finetuning[12] = {0.0,       0.0,     0.0,       0.0,     0.0,     0.0,       0.0,     0.0,       0.0,     0.0,       0.0,      0.0};
 		float tunlo,tunhi;
 		bool modmat[MMROWS][MMCOLS] = {
-			//                     |<---    w[0-8]f    --->|   |<---    w[0-8]g    --->|
-			// L1f, L2f, L1g, L2g, 0, 1, 2, 3, 4, 5, 6, 7, 8   0, 1, 2, 3, 4, 5, 6, 7, 8
-			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // L1, [0] [2] -> X
-			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // L2, [1] [3] -> X
-			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // notenmbr
-			{    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }  // notevelo
-			//   0    1    2    3  4  5  6  7  8  9 10 11 12  13 14 15 16 17 18 19 20 21
+								   // L1f, L2f, L1g, L2g, Hf, Hg
+			/* L1, [0] [2] -> X */ {    0,   0,   0,   0,  0,  0   },
+			/* L2, [1] [3] -> X */ {    0,   0,   0,   0,  0,  0   },
+			/* notenmbr */         {    0,   0,   0,   0,  0,  0   },
+			/* notevelo */         {    0,   0,   0,   0,  0,  0   }
+			//   0    1    2    3   4   5
 		}; // this is bool because i can't fix buffer overflow error that comes with int lol
 		int mmctr;
-		// harmonic synthesis
+		// additive buffer coefficient synthesis
 		float roothx;
 		hxsyn * hxs;
 		

@@ -176,17 +176,6 @@ void ofApp::cyclevm(){
                 M[xpc]=AB[arg2-1];
             }
             break;
-        case '1': // oscillator tuning
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            pc=(pc+1)%MEMLEN;
-            arg2=AB.find(M[pc]);
-            if(arg1!=-1&&arg2!=-1){
-                rootf[arg1%NOSCS]=ofMap(arg2,0,MEMLEN-1,rootflo,rootfhi);
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
         case '2': // harmonix tuning
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
@@ -204,17 +193,6 @@ void ofApp::cyclevm(){
             arg2=AB.find(M[pc]);
             if(arg1!=-1&&arg2!=-1){
                 finetuning[arg1%12]=ofMap(arg2,0,MEMLEN-1,tunlo,tunhi);
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
-        case '!': // tuning all oscs at once
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                for(int i=0;i<NOSCS;i++){
-                    rootf[i]=ofMap(arg1,0,MEMLEN-1,rootflo,rootfhi);
-                }
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -356,28 +334,6 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'i': // per oscillator gain
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            pc=(pc+1)%MEMLEN;
-            arg2=AB.find(M[pc]);
-            if(arg1!=-1&&arg2!=-1){
-                gain[arg1%NOSCS]=ofMap(arg2,0,MEMLEN-1,gainlo,gainhi);
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
-        case 'I': // all oscillators gain
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                for(int i=0;i<NOSCS;i++){
-                    gain[i]=ofMap(arg1,0,MEMLEN-1,gainlo,gainhi/NOSCS);
-                }
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
         case '/':
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
@@ -396,51 +352,6 @@ void ofApp::cyclevm(){
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
                 mgain=ofMap(arg1,0,MEMLEN-1,mglo,mghi);
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
-        case 'p': // per osc note: p <oscnum> <notenum>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            pc=(pc+1)%MEMLEN;
-            arg2=AB.find(M[pc]);
-            if(arg1!=-1&&arg2!=-1){
-                ma1=arg1%NOSCS;
-                w[ma1][wtyp[ma1]]->command(0,idx2freq(arg2,rootf[ma1]));
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
-        case 'P': // each osc note: P <notenum>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                for(int i=0;i<NOSCS;i++){
-                    w[i][wtyp[i]]->command(0,idx2freq(arg1,rootf[i]));
-                }
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
-        case '`': // per osc wave type: ` <oscnum> <osctyp>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            pc=(pc+1)%MEMLEN;
-            arg2=AB.find(M[pc]);
-            if(arg1!=-1&&arg2!=-1){
-                wtyp[arg1%NOSCS]=arg2%NWAVS;
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
-        case '~': // every osc wave type: ~ <osctyp>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                for(int i=0;i<NOSCS;i++){
-                    wtyp[i]=arg1%NWAVS;
-                }
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -654,19 +565,8 @@ void ofApp::cyclevm(){
 }
 
 void ofApp::initsynth(){
-    // audio wavs (now multiple oscillators)
-    for(int i=0;i<NOSCS;i++){
-        w[i][0]=new tri(110,0.4);
-        w[i][1]=new squ(110,0.4);
-        w[i][2]=new rsaw(110,0.4);
-        w[i][3]=new syn(110,0.4);
-        w[i][4]=new noyz(110,0.4);
-        wtyp[i]=0;
-        rootf[i]=52.0;
-        gain[i]=0.; // vol 0 to start with
-    }
-    // harmonic synthesis
-    hxs=new hxsyn(NHARM,111.,0.,3.,0.33);
+    // additive buffer coefficient synthesis
+    hxs=new hxsyn(NHARM,111.,0.);
     roothx=52.;
     // lfo wavs
     lfo1[0] = new lfosyn(2, 10);
@@ -689,11 +589,6 @@ void ofApp::initsynth(){
     tunhi=7.0;
     activenote=0;
     notevelo=0;
-    // osc gains
-    gainhi=1.0/NOSCS;
-    cout<<"[initsynth] per-osc gain limit = "<<gainhi<<endl;
-    gainlo=0.00;
-    mgain=0.0;
     mglo=0.00;
     mghi=0.95;
     cout<<"[initsynth] master gain limit = "<<mghi<<endl;
@@ -823,71 +718,12 @@ void ofApp::modgain(bool mmij, int arg, phasor * ww){
     }
 }
 
-// [TOTHINK] more lfos needed?
-void ofApp::xmod(){
-    int mmi=mmctr/MMCOLS;
-    int mmj=mmctr%MMCOLS;
-    if(mmi==0){
-        if(mmj==1){
-            lfo2[lfo2typ]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod L2f
-        }else if(mmj==3){
-            lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod L2g
-        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
-            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? lfo1[lfo1typ]->y : 0); // L1 mod w[0-8]f
-        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
-            modgain(modmat[mmi][mmj], lfo1[lfo1typ], w[mmj-13][wtyp[mmj-13]]); // L1 mod w[0-8]g
-        }
-    }else if(mmi==1){
-        if(mmj==0){
-            lfo1[lfo1typ]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod L1f
-        }else if(mmj==2){
-            lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod L1g
-        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
-            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? lfo2[lfo2typ]->y : 0); // L2 mod w[0-8]f
-        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
-            modgain(modmat[mmi][mmj], lfo2[lfo2typ], w[mmj-13][wtyp[mmj-13]]); // L2 mod w[0-8]g
-        }
-    }else if(mmi==2){
-        if(mmj==0){
-            lfo1[lfo1typ]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod L1f
-        }else if(mmj==1){
-            lfo2[lfo2typ]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod L2f
-        }else if(mmj==2){
-            lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? activenote : 0); // nn mod L1g
-        }else if(mmj==3){
-            lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? activenote : 0); // nn mod L2g
-        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
-            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w[0-8]f
-        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
-            modgain(modmat[mmi][mmj], activenote, w[mmj-13][wtyp[mmj-13]]); // nn mod w[0-8]g
-        }
-    }else if(mmi==3){
-        if(mmj==0){
-            lfo1[lfo1typ]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod L1f
-        }else if(mmj==1){
-            lfo2[lfo2typ]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod L2f
-        }else if(mmj==2){
-            lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? notevelo : 0); // nv mod L1g
-        }else if(mmj==3){
-            lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? notevelo : 0); // nv mod L2g
-        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
-            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w[0-8]f
-        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
-            modgain(modmat[mmi][mmj], notevelo, w[mmj-13][wtyp[mmj-13]]); // nv mod w[0-8]g
-        }
-    }
-    mmctr=(mmctr+1)%(MMROWS*MMCOLS);
-}
-
 void ofApp::audioOut(ofSoundBuffer &outBuffer) {
 	int sr = outBuffer.getSampleRate();
 	for(size_t i = 0; i < outBuffer.getNumFrames(); i++) {
 		// waveshaping
         float mix=0.;
-        for(int i=0;i<NOSCS;i++){
-            mix += gain[i] * w[i][wtyp[i]]->y;
-        }
-        mix += hxgain * hxs->buf[i]; // hx synth
+        mix = hxgain * hxs->buf[i]; // hx synth
 		float lmono=mgain*mix;
         // guards
 		if(lmono>0.99){
@@ -898,13 +734,8 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
 		// write out
 		outBuffer.getSample(i, 0) = lmono;
 		outBuffer.getSample(i, 1) = lmono;
-        // modulation
-        xmod();
 		// updation
-        for(int i=0;i<NOSCS;i++){
-            w[i][wtyp[i]]->update(sr);
-        }
-		lfo1[lfo1typ]->update(sr);
+        lfo1[lfo1typ]->update(sr);
         lfo2[lfo2typ]->update(sr);
         // harmonic series update
         hxs->update(sr);
@@ -1015,20 +846,14 @@ void ofApp::rndrmodmat(float x,float y){
     for(int i=0;i<MMCOLS;i++){
         sprintf(s,"%c",AB[i]);
         fnt.drawString(s,x+cw*(4+i*2),y+ch);
-        if(i>=4){
-            sprintf(s,"%d",(i-4)%NOSCS);
-            fnt.drawString(s,x+cw*(4+i*2),y);
-        }
     }
     //
     fnt.drawString("L1f",x+cw*4,y);
     fnt.drawString("L2f",x+cw*6,y);
     fnt.drawString("L1g",x+cw*8,y);
     fnt.drawString("L2g",x+cw*10,y);
-    ofDrawLine(x+cw*12,y+4-ch,x+cw*29,y+4-ch);
-    fnt.drawString("w[0-8]f",x+cw*18,y-ch);
-    ofDrawLine(x+cw*30,y+4-ch,x+cw*47,y+4-ch);
-    fnt.drawString("w[0-8]g",x+cw*36,y-ch);
+    fnt.drawString("Hf",x+cw*12,y);
+    fnt.drawString("Hg",x+cw*14,y);
     ofDrawLine(x+cw*3,y+ch+3,x+cw*(5+(MMCOLS-1)*2),y+ch+3);
 }
 
@@ -1067,8 +892,8 @@ void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
         // rndr
         rndrkb(ofGetHeight()-200-30);
         rndrmem(y);
-        rndrmodmat(112,170);
-        rndrlfos(ofGetWidth()*0.66,144);
+//         rndrmodmat(112,170);
+//         rndrlfos(ofGetWidth()*0.66,144);
         // logo
         trtlwalk();
         // oscope
