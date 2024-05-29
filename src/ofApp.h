@@ -12,8 +12,9 @@
 #define NLFOWAVS 2
 #define MMROWS 4
 #define MMCOLS 6
-#define NPRGMS 27
+#define NPRGMS 29
 #define NHARM 64
+#define BALANCER 0.05
 #define NCOEFF 4
 #define MAXNOTES 88
 
@@ -109,282 +110,7 @@ public:
 	float freqref, gainref;
 };
 
-class lfo{
-public:
-	virtual void update(int sr) = 0;
-
-	virtual void command(int ccode, float cval) = 0;
-
-	virtual void modulate(int mcode, float mval) = 0;
-
-	float freq, amp, y;
-	float freqref, ampref;
-	float t, dt;
-};
-
-// lfo phasors
-class lfosyn : public lfo {
-public:
-	lfosyn(float f, float g) {
-		freq = f;
-		amp = g;
-		freqref=f;
-		ampref=g;
-		y = 0;
-		phase=0.0;
-	}
-
-	void update(int sr) {
-		phasestep=TWO_PI*freq/sr;
-		phase+=phasestep;
-		y = amp * sin(phase);
-		if(phase>TWO_PI) phase-=TWO_PI;
-	}
-
-	void command(int cc, float cv){
-		switch(cc){
-			case 0:
-				freq=cv;
-				freqref=freq;
-				break;
-			case 1:
-				amp=cv;
-				ampref=amp;
-				break;
-		}
-	}
-
-	void modulate(int mc, float mv){
-		switch(mc){
-			case 0:
-				freq=freqref+mv;
-				break;
-			case 1:
-				amp=ampref+mv;
-				break;
-		}
-	}
-
-	float phase,phasestep;
-};
-
-class lfosqu : public lfo {
-public:
-	lfosqu(float f, float g) {
-		freq = f;
-		amp = g;
-		freqref=f;
-		ampref=g;
-		y = 0;
-		yy=0;
-		phase=0.0;
-	}
-
-	void update(int sr) {
-		phasestep=TWO_PI*freq/sr;
-		phase+=phasestep;
-		yy = sin(phase);
-		y=yy>0?amp:-amp;
-		if(phase>TWO_PI) phase-=TWO_PI;
-	}
-
-	void command(int cc, float cv){
-		switch(cc){
-			case 0:
-				freq=cv;
-				freqref=freq;
-				break;
-			case 1:
-				amp=cv;
-				ampref=amp;
-				break;
-		}
-	}
-
-	void modulate(int mc, float mv){
-		switch(mc){
-			case 0:
-				freq=freqref+mv;
-				break;
-			case 1:
-				amp=ampref+mv;
-				break;
-		}
-	}
-
-	float phase,phasestep;
-	float yy;
-};
-
 // audio phasors
-class rsaw : public phasor {
-public:
-	rsaw(float f, float g) {
-		freq = f;
-		gain = g;
-		freqref=f;
-		gainref=g;
-		y = 0;
-		delta=0.0;
-		deltaref=0.0;
-		yy=0;
-	}
-
-	void update(int sr) {
-		phasestep = 2.0 * freq / sr; // forget not the struggle! A2 ?= 110.25 Hz
-		float bot=phasestep*(1.-delta);
-		float top=phasestep*(1.+delta);
-		float dy=ofRandom(bot,top);
-		yy = yy+dy;
-		if (yy >= 1) {
-			yy = -1;
-		}
-		y=yy*gain;
-	}
-
-	void command(int cc, float cv){
-		switch(cc){
-			case 0:
-				freq=cv<33?33:cv;
-				freqref=freq;
-				break;
-			case 1:
-				gain=cv>1?1:(cv<0?0:cv);
-				gainref=gain;
-				break;
-			case 2:
-				delta=cv;
-				deltaref=delta;
-				break;
-		}
-	}
-
-	void modulate(int mc, float mv){
-		float tmp;
-		switch(mc){
-			case 0:
-				freq=freqref+mv;
-				freq=freq<33?33:freq;
-				break;
-			case 1:
-				tmp=gainref*mv;
-				gain=tmp>1?1:(tmp<0?0:tmp);
-				break;
-			case 2:
-				delta=deltaref+mv;
-				break;
-		}
-	}
-
-	float delta,yy;
-	float deltaref;
-};
-
-class squ : public phasor {
-public:
-	squ(float f, float g) {
-		freq = f;
-		gain = g;
-		freqref=f;
-		gainref=g;
-		y =0.;
-		y_=0;
-		yy=1.;
-		phase=0.0;
-	}
-
-	void update(int sr) {
-		phasestep=TWO_PI*freq/sr;
-		phase+=phasestep;
-		yy=sin(phase);
-		y=yy>0?gain:-gain;
-		if(phase>TWO_PI) phase-=TWO_PI;
-	}
-
-	void command(int cc, float cv){
-		switch(cc){
-			case 0:
-				freq=cv<33?33:cv;
-				freqref=freq;
-				break;
-			case 1:
-				gain=cv>1?1:(cv<0?0:cv);
-				gainref=gain;
-				break;
-		}
-	}
-
-	void modulate(int mc, float mv){
-		float tmp;
-		switch(mc){
-			case 0:
-				freq=freqref+mv;
-				freq=freq<33?33:freq;
-				break;
-			case 1:
-				tmp=gainref*mv;
-				gain=tmp>1?1:(tmp<0?0:tmp);
-				break;
-		}
-	}
-
-	float y_,yy;
-};
-
-class tri : public phasor {
-public:
-	tri(float f, float g) {
-		freq = f;
-		gain = g;
-		freqref=f;
-		gainref=g;
-		y = 0;
-		ydir = 1;
-		yy=0.;
-	}
-
-	void update(int sr) {
-		phasestep = 2.0 * freq / sr;
-		yy += 2.*ydir*phasestep;
-		if (yy >= 1) {
-			ydir = -1;
-		}else if(yy <= -1){
-			ydir = 1;
-		}
-		y=yy*gain;
-	}
-
-	void command(int cc, float cv){
-		switch(cc){
-			case 0:
-				freq=cv<33?33:cv;
-				freqref=freq;
-				break;
-			case 1:
-				gain=cv>1?1:(cv<0?0:cv);
-				gainref=gain;
-				break;
-		}
-	}
-
-	void modulate(int mc, float mv){
-		float tmp;
-		switch(mc){
-			case 0:
-				tmp=freqref+mv;
-				freq=tmp<33?33:tmp;
-				break;
-			case 1:
-				tmp=gainref*mv;
-				gain=tmp>1?1:(tmp<0?0:tmp);
-				break;
-		}
-	}
-
-	int ydir;
-	float yy;
-};
-
 class syn : public phasor {
 public:
 	syn(float f, float g) {
@@ -435,57 +161,35 @@ public:
 	float yy;
 };
 
-class noyz : public phasor {
+// harmonic series engine interface
+class hxser {
 public:
-	noyz(float f, float g) {
-		freq = f;
-		gain = g;
-		freqref=f;
-		gainref=g;
-		y = 0;
-		phase = 0.0;
+	void update(int sr){
 		yy=0.;
-	}
-
-	void update(int sr) {
-		yy = ofRandom(0.99,-0.99);
-		y=yy*gain;
-	}
-
-	void command(int cc, float cv){
-		switch(cc){
-			case 0:
-				freq=cv<33?33:cv;
-				freqref=freq;
-				break; // deep dive into noise color later
-			case 1:
-				gain=cv>1?1:(cv<0?0:cv);
-				gainref=gain;
-				break;
+		for(int i=0;i<nhx;i++){
+			yy+=hx[i]->y;
+			hx[i]->update(sr);
 		}
+		y=G*yy;
+		buf[uctr]=y;
+		uctr=(uctr+1)%BUFSZ;
 	}
 
-	void modulate(int mc, float mv){
-		float tmp;
-		switch(mc){
-			case 0:
-				freq=freqref+mv;
-				freq=freq<33?33:freq;
-				break;
-			case 1:
-				tmp=gainref*mv;
-				gain=tmp>1?1:(tmp<0?0:tmp);
-				break;
-		}
-	}
+	virtual void sethxfreqgain() = 0;
+	virtual void command(int cc,int n,float cv[]) = 0;
 
-	float yy;
+	float yy,y;
+	int nhx,uctr;
+	float G,F;
+	float Fref,Gref;
+	syn ** hx;
+	float buf[BUFSZ];
 };
 
-// harmonic series synth
-class hxsyn {
+// additive coefficient buffer synth
+class acobuf : public hxser {
 public:
-	hxsyn(int n, float f, float g) {
+	acobuf(int n, float f, float g) {
 		nhx=n;
 		F=f;
 		G=g;
@@ -509,17 +213,6 @@ public:
 		yy=0.;
 	}
 
-	void update(int sr) {
-		yy=0.;
-		for(int i=0;i<nhx;i++){
-			yy+=hx[i]->y;
-			hx[i]->update(sr);
-		}
-		y=G*yy;
-		buf[uctr]=y;
-		uctr=(uctr+1)%BUFSZ;
-	}
-
 	void sethxfreqgain(){
 		for(int i=0;i<nhx;i++){
 			float fi=F+i*rot[i%NCOEFF];
@@ -529,16 +222,33 @@ public:
 		}
 	}
 
-	void command(int cc, float cv){
+	void command(int cc, int n, float cv[]){
 		switch(cc){
 			case 0:
-				F=cv<33?33:cv;
+				F=cv[0]<33?33:cv[0];
 				Fref=F;
 				sethxfreqgain();
 				break;
 			case 1:
-				G=cv>1?1:(cv<0?0:cv);
+				G=cv[0]>1?1:(cv[0]<0?0:cv[0]);
 				Gref=G;
+				break;
+			case 2:
+				if(n!=2){
+					cout<<"[ERROR] cmd:setrot rcvd n="<<n<<endl;
+					return;
+				}
+				setrot((int)cv[0], (int)cv[1]);
+				break;
+			case 3:
+				if(n!=2){
+					cout<<"[ERROR] cmd:setvol rcvd n="<<n<<endl;
+					return;
+				}
+				setvol((int)cv[0], (int)cv[1]);
+				break;
+			case 4:
+				sethxfreqgain();
 				break;
 		}
 	}
@@ -555,29 +265,87 @@ public:
 		}
 	}
 
-	// modulation now under test
-	void modulate(int mc, float mv){
-		float tmp;
-		switch(mc){
+	int rot[NCOEFF];
+	int vol[NCOEFF];
+};
+
+// additive quadratic coefficient synth
+class quadra : public hxser {
+public:
+	quadra(int n, float f, float g) {
+		nhx=n;
+		F=f;
+		G=g;
+		Fref=f;
+		Gref=g;
+		g0=1.;
+		g1=0.;
+		g2=0.;
+		hx=new syn*[nhx];
+		for(int i=0;i<nhx;i++){
+			float fi=F + i*i*k2 + i*k1;
+			float phi=(TWO_PI/360.0) * i*g2;
+			float gi=(1.0/(float)NHARM) * exp(-abs(g0 * (i-g1) * sin(phi)));
+			hx[i]=new syn(fi,gi);
+		}
+		for(int i=0;i<BUFSZ;i++){
+			buf[i]=0.;
+		}
+		uctr=0;
+		y=0.;
+		yy=0.;
+		k2=0.;
+		k1=1.;
+	}
+
+	void sethxfreqgain(){
+		for(int i=0;i<nhx;i++){
+			float fi=F + i*i*k2 + i*k1;
+			float phi=(TWO_PI/360.0) * i*g2;
+			float gi=(1.0/(float)NHARM) * exp(-abs(g0 * (i-g1) * sin(phi)));
+			hx[i]->command(0, fi);
+			hx[i]->command(1, gi);
+		}
+	}
+
+	void command(int cc, int n, float cv[]){
+		switch(cc){
 			case 0:
-				F=Fref+mv;
-				F=F<33?33:F;
+				F=cv[0]<33?33:cv[0];
+				Fref=F;
+				sethxfreqgain();
 				break;
 			case 1:
-				tmp=Gref*mv;
-				G=tmp>1?1:(tmp<0?0:tmp);
+				G=cv[0]>1?1:(cv[0]<0?0:cv[0]);
+				Gref=G;
+				break;
+			case 2:
+				if(n!=2){
+					cout<<"[ERROR] for quadratic coeffs, n was found to be: "<<n<<endl;
+					return;
+				}
+				k2=cv[0];
+				k1=cv[1];
+				sethxfreqgain();
+				break;
+			case 3:
+				if(n!=3){
+					cout<<"[ERROR] for exp sin coeffs, n was found to be: "<<n<<endl;
+					return;
+				}
+				g0=cv[0];
+				g1=cv[1];
+				g2=cv[2];
+				sethxfreqgain();
+				break;
+			case 4:
+				sethxfreqgain();
 				break;
 		}
 	}
 
-	float yy,y;
-	int nhx,uctr;
-	float G,F;
-	float Fref,Gref;
-	syn ** hx;
-	float buf[BUFSZ];
-	int rot[NCOEFF];
-	int vol[NCOEFF];
+	float k2,k1;
+	float g0,g1,g2;
 };
 
 class ofApp : public ofBaseApp{
@@ -615,12 +383,6 @@ class ofApp : public ofBaseApp{
 		void f5(float x,float y,int times,ofPixelsRef & pixelsRef);
 		void color12(int c);
 		void initsynth();
-		void rndrmodmat(float x,float y);
-		void rndrlfos(float x,float y);
-		void modgain(bool mmij, lfo * oo, phasor * ww);
-		void modgain(bool mmij, int arg, phasor * ww);
-		void xmod();
-		void clrmodmat();
 		void loadprogram(int pid);
 		void loadshader(int pid);
 		void initlogo();
@@ -637,13 +399,6 @@ class ofApp : public ofBaseApp{
 		float rms;
 
 		// synth
-		lfo * lfo1[NLFOWAVS];
-		lfo * lfo2[NLFOWAVS];
-		vector<float> lfo1scope;
-		vector<float> lfo2scope;
-		int lfobufsz;
-		int lfoctr;
-		int lfo1typ,lfo2typ;
 		float rootflo,rootfhi;
 		float hxgainlim,hxgain;
 		float mgain;
@@ -653,18 +408,10 @@ class ofApp : public ofBaseApp{
 		float tuning[12]     = {1.0, 17.0/16.0, 9.0/8.0, 19.0/16.0, 5.0/4.0, 4.0/3.0, 17.0/12.0, 3.0/2.0, 19.0/12.0, 5.0/3.0, 85.0/48.0, 15.0/8.0};
 		float finetuning[12] = {0.0,       0.0,     0.0,       0.0,     0.0,     0.0,       0.0,     0.0,       0.0,     0.0,       0.0,      0.0};
 		float tunlo,tunhi;
-		bool modmat[MMROWS][MMCOLS] = {
-								   // L1f, L2f, L1g, L2g, Hf, Hg
-			/* L1, [0] [2] -> X */ {    0,   0,   0,   0,  0,  0   },
-			/* L2, [1] [3] -> X */ {    0,   0,   0,   0,  0,  0   },
-			/* notenmbr */         {    0,   0,   0,   0,  0,  0   },
-			/* notevelo */         {    0,   0,   0,   0,  0,  0   }
-			//   0    1    2    3   4   5
-		}; // this is bool because i can't fix buffer overflow error that comes with int lol
-		int mmctr;
 		// additive buffer coefficient synthesis
 		float roothx;
-		hxsyn * hxs;
+		acobuf * hxa;
+		quadra * hxq;
 		
 		// midi
 		u_char * kb;
@@ -677,7 +424,7 @@ class ofApp : public ofBaseApp{
 
 		// vm
 		char M[MEMLEN];
-		// programs (patches) [0-9]
+		// programs (patches) [0-9a-z]
 		// sooner or later these are going to go into a file ;-P
 		string prgms[NPRGMS]={
 			"^q1qDc13iq0g0c19ccanopqoc1mcknfa`q3 c1x 39N 3aSmM..............................................",
@@ -714,7 +461,10 @@ class ofApp : public ofBaseApp{
 
 			"n,g0j0k>>>>cn5q,c1fea620=m03f3wB>``^TX,~B c'vm\"J\"<,2> c$w<,4> cC7cC8cC9cCa....................2",
 			"nqg0j0kMOMMcn5qqc1fea620=m03f3ww&``^gX,~w c'vm\"J\"<,2& c$w<,4M cC7#C~OcK8#C3McR9#CnMcYa........2",
-			"nrg0j0kz#^&cn5qrc1fea620=m03f3w(W``^SX,~( c'vm\"J\"<,2W c$w<,4z cC7#C2#cK8#C4^cR9#C6&cYa........2"
+			"nrg0j0kz#^&cn5qrc1fea620=m03f3w(W``^SX,~( c'vm\"J\"<,2W c$w<,4z cC7#C2#cK8#C4^cR9#C6&cYa........2",
+
+			"n,g0mZj0q,k2015c19cY7A00c3m%632c.s>n57 cub<s8X%X30 c\\  c!c^6>Ba>%>31 cFH cJdJZeb820=X03f5 cse..",
+			"mZi0K0a00n`g0c,3p`cahJZ^+cv6zh1ae6820 =z0c....................................................."
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
