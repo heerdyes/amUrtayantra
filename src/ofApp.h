@@ -12,7 +12,7 @@
 #define NLFOWAVS 2
 #define MMROWS 4
 #define MMCOLS 6
-#define NPRGMS 29
+#define NPRGMS 30
 #define NHARM 64
 #define BALANCER 0.05
 #define NCOEFF 4
@@ -296,6 +296,18 @@ public:
 		yy=0.;
 		k2=0.;
 		k1=1.;
+		overdrive=1.;
+	}
+
+	void update(int sr){
+		yy=0.;
+		for(int i=0;i<nhx;i++){
+			yy+=hx[i]->y;
+			hx[i]->update(sr);
+		}
+		y=overdrive * G*yy;
+		buf[uctr]=y;
+		uctr=(uctr+1)%BUFSZ;
 	}
 
 	void sethxfreqgain(){
@@ -316,7 +328,8 @@ public:
 				sethxfreqgain();
 				break;
 			case 1:
-				G=cv[0]>1?1:(cv[0]<0?0:cv[0]);
+// 				G=cv[0]>1?1:(cv[0]<0?0:cv[0]);
+				G=cv[0];
 				Gref=G;
 				break;
 			case 2:
@@ -341,11 +354,19 @@ public:
 			case 4:
 				sethxfreqgain();
 				break;
+			case 5:
+				if(n!=1){
+					cout<<"[ERROR] for overdrive, n was found to be: "<<n<<endl;
+					return;
+				}
+				overdrive=cv[0]<1.?1.:cv[0]>9.?9.:cv[0];
+				break;
 		}
 	}
 
 	float k2,k1;
 	float g0,g1,g2;
+	float overdrive;
 };
 
 class ofApp : public ofBaseApp{
@@ -464,7 +485,8 @@ class ofApp : public ofBaseApp{
 			"nrg0j0kz#^&cn5qrc1fea620=m03f3w(W``^SX,~( c'vm\"J\"<,2W c$w<,4z cC7#C2#cK8#C4^cR9#C6&cYa........2",
 
 			"n,g0mZj0q,k2015c19cY7A00c3m%632c.s>n57 cub<s8X%X30 c\\  c!c^6>Ba>%>31 cFH cJdJZeb820=X03f5 cse..",
-			"mZi0K0a00n`g0c,3p`cahJZ^+cv6zh1ae6820 =z0c....................................................."
+			"mZi0K0a00n`g0c,3p`cahJZ^+cv6zh1ae6820 =z0c.....................................................",
+			"i1mtpwnwc75zZ11ce1JZDDK0maJW2d12Fvm cyo>y5J c]q<yiF c@wg0j0 c*Ak1E?7w}}_:qw c7Qvu<W4? c<I......"
 		};
 		// alfabet
 		string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";

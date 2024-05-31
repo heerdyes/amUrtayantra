@@ -505,17 +505,19 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'K': // [quadra] K <k2> <k1> <k0>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
+        case 'K': // [quadra] K <arg1>.<arg2> <arg3>.<arg4>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,5*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
             arg2=AB.find(M[pc]); // k2 = <arg1>.<arg2>
             pc=(pc+1)%MEMLEN;
-            arg3=AB.find(M[pc]); // k1
-            if(arg1!=-1&&arg2!=-1&&arg3!=-1){
+            arg3=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg4=AB.find(M[pc]); // k1 = <arg3>.<arg4>
+            if(arg1!=-1&&arg2!=-1&&arg3!=-1&&arg4!=-1){
                 cvargs[0]=(float)arg1 + (float)arg2/(float)MEMLEN;
-                cvargs[1]=arg3;
+                cvargs[1]=(float)arg3 + (float)arg4/(float)MEMLEN;
                 hxq->command(2,2,cvargs); // quadratic coefficients
             }
             pc=(pc+1)%MEMLEN;
@@ -557,6 +559,16 @@ void ofApp::cyclevm(){
             if(arg1!=-1){
                 cvargs[0]=idx2freq(arg1,roothx);
                 hxq->command(0,1,cvargs); // passing note frequency
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
+        case 'D':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            if(arg1!=-1){
+                cvargs[0]=ofMap(arg1,0,MEMLEN,1.,9.);
+                hxq->command(5,1,cvargs); // passing overdrive
             }
             pc=(pc+1)%MEMLEN;
             break;
