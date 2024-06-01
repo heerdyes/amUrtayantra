@@ -516,7 +516,9 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             arg4=AB.find(M[pc]); // k1 = <arg3>.<arg4>
             if(arg1!=-1&&arg2!=-1&&arg3!=-1&&arg4!=-1){
-                cvargs[0]=(float)arg1 + (float)arg2/(float)MEMLEN;
+                // k2=4 gives freq = 63^2 * 4 + 63*94 = 21798
+                // which is already more than the limit
+                cvargs[0]=ofMap(arg1,0,MEMLEN,0.,4.) + (float)arg2/(float)MEMLEN;
                 cvargs[1]=(float)arg3 + (float)arg4/(float)MEMLEN;
                 hxq->command(2,2,cvargs); // quadratic coefficients
             }
@@ -567,8 +569,27 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
-                cvargs[0]=ofMap(arg1,0,MEMLEN,1.,9.);
+                cvargs[0]=ofMap(arg1,0,MEMLEN,1.,49.);
                 hxq->command(5,1,cvargs); // passing overdrive
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
+        case 's': // stereo channel mix coefficients
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg3=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1&&arg3!=-1){
+                cvargs[0]=(float)arg2/(float)MEMLEN;
+                cvargs[1]=(float)arg3/(float)MEMLEN;
+                if(arg1%2==0){
+                    hxa->command(6,2,cvargs); // passing stereo kL, kR to acobuf
+                }else{
+                    hxq->command(6,2,cvargs); // passing stereo kL, kR to quadra
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -703,19 +724,23 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
 	int sr = outBuffer.getSampleRate();
 	for(size_t i = 0; i < outBuffer.getNumFrames(); i++) {
 		// waveshaping
-        float mix=0.;
-        mix += hxgain * hxa->buf[i]; // acobuf
-        mix += hxgain * hxq->buf[i]; // quadra
-		float lmono=mgain*mix;
-        // guards
-		if(lmono>0.99){
-            lmono=mghi;
-        }else if(lmono<-0.99){
-            lmono=-mghi;
+        float eg = mgain * hxgain;
+        float lmix = eg * (hxa->lmix(i) + hxq->lmix(i));
+        float rmix = eg * (hxa->rmix(i) + hxq->rmix(i));
+		// guards/limits
+		if(lmix>0.99){
+            lmix=mghi;
+        }else if(lmix<-0.99){
+            lmix=-mghi;
+        }
+        if(rmix>0.99){
+            rmix=mghi;
+        }else if(rmix<-0.99){
+            rmix=-mghi;
         }
 		// write out
-		outBuffer.getSample(i, 0) = lmono;
-		outBuffer.getSample(i, 1) = lmono;
+		outBuffer.getSample(i, 0) = lmix;
+		outBuffer.getSample(i, 1) = rmix;
         // harmonic engines update
         hxa->update(sr);
         hxq->update(sr);
@@ -793,6 +818,18 @@ void ofApp::trtlwalk(){
     }
 }
 
+void ofApp::rndrhxser(hxser * H,float x,float y,float w,float h){
+    // render harmonix
+    ofSetColor(23,202,232);
+    float gk=3000.;
+    for(int i=0;i<NHARM;i++){
+        syn * hrm=H->hx[i];
+        float dx=ofMap(hrm->freq,0.,20000.,0.,w);
+        float gy=gk*hrm->gain;
+        ofDrawLine(x+dx,y+h-gy,x+dx,y+h);
+    }
+}
+
 void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
     // shadercam
     rndrcam(pixelsRef);
@@ -809,6 +846,9 @@ void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
         ofSetColor(0,240,0);
         ofSetLineWidth(1 + (rms * 30.));
         waveform.draw();
+        // harmonic rendering
+        rndrhxser(hxq,50.,80.,800.,300.);
+        rndrhxser(hxa,0.5*ofGetWidth(),80.,800.,300.);
         // cycling the vm
         cyclevm();
     }

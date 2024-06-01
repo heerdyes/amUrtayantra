@@ -177,6 +177,8 @@ public:
 
 	virtual void sethxfreqgain() = 0;
 	virtual void command(int cc,int n,float cv[]) = 0;
+	virtual float lmix(size_t i) = 0;
+	virtual float rmix(size_t i) = 0;
 
 	float yy,y;
 	int nhx,uctr;
@@ -184,6 +186,7 @@ public:
 	float Fref,Gref;
 	syn ** hx;
 	float buf[BUFSZ];
+	float kL, kR; // gain coefficients for left/right channels
 };
 
 // additive coefficient buffer synth
@@ -211,7 +214,12 @@ public:
 		uctr=0;
 		y=0.;
 		yy=0.;
+		kL=0.5;
+		kR=0.5;
 	}
+
+	float lmix(size_t i) { return buf[i] * kL; }
+	float rmix(size_t i) { return buf[i] * kR; }
 
 	void sethxfreqgain(){
 		for(int i=0;i<nhx;i++){
@@ -249,6 +257,16 @@ public:
 				break;
 			case 4:
 				sethxfreqgain();
+				break;
+			case 5:
+				break;
+			case 6:
+				if(n!=2){
+					cout<<"[ERROR][acobuf] for stereo, n was found to be: "<<n<<endl;
+					return;
+				}
+				kL=cv[0];
+				kR=cv[1];
 				break;
 		}
 	}
@@ -297,18 +315,12 @@ public:
 		k2=0.;
 		k1=1.;
 		overdrive=1.;
+		kL=0.5;
+		kR=0.5;
 	}
 
-	void update(int sr){
-		yy=0.;
-		for(int i=0;i<nhx;i++){
-			yy+=hx[i]->y;
-			hx[i]->update(sr);
-		}
-		y=overdrive * G*yy;
-		buf[uctr]=y;
-		uctr=(uctr+1)%BUFSZ;
-	}
+	float lmix(size_t i) { return buf[i] * overdrive * kL; }
+	float rmix(size_t i) { return buf[i] * overdrive * kR; }
 
 	void sethxfreqgain(){
 		for(int i=0;i<nhx;i++){
@@ -359,7 +371,15 @@ public:
 					cout<<"[ERROR] for overdrive, n was found to be: "<<n<<endl;
 					return;
 				}
-				overdrive=cv[0]<1.?1.:cv[0]>9.?9.:cv[0];
+				overdrive=cv[0];
+				break;
+			case 6:
+				if(n!=2){
+					cout<<"[ERROR][quadra] for stereo, n was found to be: "<<n<<endl;
+					return;
+				}
+				kL=cv[0];
+				kR=cv[1];
 				break;
 		}
 	}
@@ -411,6 +431,7 @@ class ofApp : public ofBaseApp{
 		void initcam();
 		void rndrcam(ofPixelsRef & pixelsRef);
 		void initshdr();
+		void rndrhxser(hxser * H,float x,float y,float w,float h);
 
 		// audio
 		std::mutex audioMutex;
@@ -431,8 +452,8 @@ class ofApp : public ofBaseApp{
 		float tunlo,tunhi;
 		// additive buffer coefficient synthesis
 		float roothx;
-		acobuf * hxa;
-		quadra * hxq;
+		hxser * hxa;
+		hxser * hxq;
 		
 		// midi
 		u_char * kb;
