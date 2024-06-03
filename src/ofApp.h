@@ -17,6 +17,7 @@
 #define BALANCER 0.05
 #define NCOEFF 4
 #define MAXNOTES 88
+#define OVERDRIVE_LIMIT 12.0
 
 #define SMPLRATE 44100
 #define BUFSZ 512
@@ -187,6 +188,7 @@ public:
 	syn ** hx;
 	float buf[BUFSZ];
 	float kL, kR; // gain coefficients for left/right channels
+	float overdrive;
 };
 
 // additive coefficient buffer synth
@@ -216,10 +218,11 @@ public:
 		yy=0.;
 		kL=0.5;
 		kR=0.5;
+		overdrive=1.;
 	}
 
-	float lmix(size_t i) { return buf[i] * kL; }
-	float rmix(size_t i) { return buf[i] * kR; }
+	float lmix(size_t i) { return buf[i] * overdrive * kL; }
+	float rmix(size_t i) { return buf[i] * overdrive * kR; }
 
 	void sethxfreqgain(){
 		for(int i=0;i<nhx;i++){
@@ -259,6 +262,11 @@ public:
 				sethxfreqgain();
 				break;
 			case 5:
+				if(n!=1){
+					cout<<"[ERROR] for overdrive, n was found to be: "<<n<<endl;
+					return;
+				}
+				overdrive=cv[0];
 				break;
 			case 6:
 				if(n!=2){
@@ -386,7 +394,6 @@ public:
 
 	float k2,k1;
 	float g0,g1,g2;
-	float overdrive;
 };
 
 class ofApp : public ofBaseApp{

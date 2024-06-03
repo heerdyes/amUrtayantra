@@ -297,6 +297,20 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
+        case '_':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            if(arg1!=-1&&arg2!=-1){
+                arg1=AB.find(M[arg1]);
+                arg2=AB.find(M[arg2]);
+                M[pc]=arg1<arg2?AB[MEMLEN-(arg2-arg1)]:AB[arg1-arg2];
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
         case '*':
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
@@ -330,8 +344,22 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             arg2=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
-            if(arg1!=-1&&arg2!=-1){
+            if(arg1!=-1&&arg2!=-1&&arg2!=0){
                 M[pc]=AB[(arg1%arg2)%MEMLEN];
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
+        case '5':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            if(arg1!=-1&&arg2!=-1){
+                arg1=AB.find(M[arg1]);
+                arg2=AB.find(M[arg2]);
+                if(arg2!=0) M[pc]=AB[(arg1%arg2)%MEMLEN];
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -344,6 +372,20 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             if(arg1!=-1&&arg2!=-1&&arg2!=0){
                 M[pc]=AB[(arg1/arg2)%MEMLEN];
+            }
+            pc=(pc+1)%MEMLEN;
+            break;
+        case '\\':
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,4*cw-3,ch+5);
+            pc=(pc+1)%MEMLEN;
+            arg1=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            arg2=AB.find(M[pc]);
+            pc=(pc+1)%MEMLEN;
+            if(arg1!=-1&&arg2!=-1){
+                arg1=AB.find(M[arg1]);
+                arg2=AB.find(M[arg2]);
+                if(arg2!=0) M[pc]=AB[(arg1/arg2)%MEMLEN];
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -448,55 +490,84 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'k': // [acobuf] harmonix rot/koefficient array: NCOEFF params
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,(1+NCOEFF)*cw-3,ch+5);
-            for(int i=0;i<NCOEFF;i++){
-                pc=(pc+1)%MEMLEN;
-                arg1=AB.find(M[pc]);
-                if(arg1!=-1){
-                    cvargs[0]=i;
-                    cvargs[1]=arg1;
-                    hxa->command(2,2,cvargs); // setrot(i,arg1)
-                }
-            }
-            hxa->command(4,0,cvargs); // sethxfreqgain()
-            pc=(pc+1)%MEMLEN;
-            break;
-        case 'w': // [acobuf] harmonix vol/weight array: NCOEFF params
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,(1+NCOEFF)*cw-3,ch+5);
-            for(int i=0;i<NCOEFF;i++){
-                pc=(pc+1)%MEMLEN;
-                arg1=AB.find(M[pc]);
-                if(arg1!=-1){
-                    cvargs[0]=i;
-                    cvargs[1]=arg1;
-                    hxa->command(3,2,cvargs); // setvol(i,arg1)
-                }
-            }
-            hxa->command(4,0,cvargs); // sethxfreqgain()
-            pc=(pc+1)%MEMLEN;
-            break;
-        case 'q': // [acobuf] harmonix note: q <notenum>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
+        case 'h': // harmonix coefficients
+            pos=pc;
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
-                cvargs[0]=idx2freq(arg1,roothx);
-                hxa->command(0,1,cvargs); // passing note frequency
+                if(arg1%2==0){ // quadra
+                    ofSetColor(248,248,248); ofDrawRectangle(vmx+pos*cw,vmy-ch+5,6*cw-3,ch+5);
+                    pc=(pc+1)%MEMLEN;
+                    arg1=AB.find(M[pc]);
+                    pc=(pc+1)%MEMLEN;
+                    arg2=AB.find(M[pc]); // k2 = <arg1>.<arg2>
+                    pc=(pc+1)%MEMLEN;
+                    arg3=AB.find(M[pc]);
+                    pc=(pc+1)%MEMLEN;
+                    arg4=AB.find(M[pc]); // k1 = <arg3>.<arg4>
+                    if(arg1!=-1&&arg2!=-1&&arg3!=-1&&arg4!=-1){
+                        // k2=4 gives freq = 63^2 * 4 + 63*94 = 21798
+                        // which is already more than the limit
+                        cvargs[0]=ofMap(arg1,0,MEMLEN,0.,4.) + (float)arg2/(float)MEMLEN;
+                        cvargs[1]=(float)arg3 + (float)arg4/(float)MEMLEN;
+                        hxq->command(2,2,cvargs); // quadratic coefficients
+                    }
+                }else{
+                    ofSetColor(248,248,248); ofDrawRectangle(vmx+pos*cw,vmy-ch+5,(2+NCOEFF)*cw-3,ch+5);
+                    for(int i=0;i<NCOEFF;i++){
+                        pc=(pc+1)%MEMLEN;
+                        arg1=AB.find(M[pc]);
+                        if(arg1!=-1){
+                            cvargs[0]=i;
+                            cvargs[1]=arg1;
+                            hxa->command(2,2,cvargs); // setrot(i,arg1)
+                        }
+                    }
+                    hxa->command(4,0,cvargs); // sethxfreqgain()
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'j': // [acobuf] harmonix gain
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
+        case 'w': // harmonix parametric array
+            pos=pc;
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             if(arg1!=-1){
-                cvargs[0]=ofMap(arg1,0,MEMLEN,0.,1.);
-                hxa->command(1,1,cvargs);
+                if(arg1%2==0){ // [quadra] K <g0> <g1> <g2>
+                    ofSetColor(248,248,248); ofDrawRectangle(vmx+pos*cw,vmy-ch+5,7*cw-3,ch+5);
+                    pc=(pc+1)%MEMLEN;
+                    arg1=AB.find(M[pc]);
+                    pc=(pc+1)%MEMLEN;
+                    arg2=AB.find(M[pc]); // g0 = <arg1>.<arg2>
+                    pc=(pc+1)%MEMLEN;
+                    arg3=AB.find(M[pc]); // g1 = <arg3>
+                    pc=(pc+1)%MEMLEN;
+                    arg4=AB.find(M[pc]);
+                    pc=(pc+1)%MEMLEN;
+                    arg5=AB.find(M[pc]); // g2 = <arg4>.<arg5>
+                    if(arg1!=-1&&arg2!=-1&&arg3!=-1&&arg4!=-1&&arg5!=-1){
+                        cvargs[0]=(float)arg1 + (float)arg2/(float)MEMLEN;
+                        cvargs[1]=arg3;
+                        cvargs[2]=(float)arg4 + (float)arg5/(float)MEMLEN;
+                        hxq->command(3,3,cvargs); // exp sin coefficients
+                    }
+                }else{ // [acobuf] harmonix vol/weight array: NCOEFF params
+                    ofSetColor(248,248,248); ofDrawRectangle(vmx+pos*cw,vmy-ch+5,(2+NCOEFF)*cw-3,ch+5);
+                    for(int i=0;i<NCOEFF;i++){
+                        pc=(pc+1)%MEMLEN;
+                        arg1=AB.find(M[pc]);
+                        if(arg1!=-1){
+                            cvargs[0]=i;
+                            cvargs[1]=arg1;
+                            hxa->command(3,2,cvargs); // setvol(i,arg1)
+                        }
+                    }
+                    hxa->command(4,0,cvargs); // sethxfreqgain()
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'J': // harmonix main gain
+        case 'I': // harmonix main gain
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
@@ -505,72 +576,52 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'K': // [quadra] K <arg1>.<arg2> <arg3>.<arg4>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,5*cw-3,ch+5);
+        case 'i': // gains
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
-            arg2=AB.find(M[pc]); // k2 = <arg1>.<arg2>
-            pc=(pc+1)%MEMLEN;
-            arg3=AB.find(M[pc]);
-            pc=(pc+1)%MEMLEN;
-            arg4=AB.find(M[pc]); // k1 = <arg3>.<arg4>
-            if(arg1!=-1&&arg2!=-1&&arg3!=-1&&arg4!=-1){
-                // k2=4 gives freq = 63^2 * 4 + 63*94 = 21798
-                // which is already more than the limit
-                cvargs[0]=ofMap(arg1,0,MEMLEN,0.,4.) + (float)arg2/(float)MEMLEN;
-                cvargs[1]=(float)arg3 + (float)arg4/(float)MEMLEN;
-                hxq->command(2,2,cvargs); // quadratic coefficients
+            arg2=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                cvargs[0]=ofMap(arg2,0,MEMLEN,0.,1.);
+                if(arg1%2==0){ // [quadra] gain
+                    hxq->command(1,1,cvargs);
+                }else{ // [acobuf] gain
+                    hxa->command(1,1,cvargs);
+                }
+                // space for more additive sub-engines
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'W': // [quadra] K <g0> <g1> <g2>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,6*cw-3,ch+5);
+        case 'p': // note frequency: p <notenum>
+            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
             pc=(pc+1)%MEMLEN;
-            arg2=AB.find(M[pc]); // g0 = <arg1>.<arg2>
-            pc=(pc+1)%MEMLEN;
-            arg3=AB.find(M[pc]); // g1 = <arg3>
-            pc=(pc+1)%MEMLEN;
-            arg4=AB.find(M[pc]);
-            pc=(pc+1)%MEMLEN;
-            arg5=AB.find(M[pc]); // g2 = <arg4>.<arg5>
-            if(arg1!=-1&&arg2!=-1&&arg3!=-1&&arg4!=-1&&arg5!=-1){
-                cvargs[0]=(float)arg1 + (float)arg2/(float)MEMLEN;
-                cvargs[1]=arg3;
-                cvargs[2]=(float)arg4 + (float)arg5/(float)MEMLEN;
-                hxq->command(3,3,cvargs); // exp sin coefficients
+            arg2=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                cvargs[0]=idx2freq(arg2,roothx);
+                if(arg1%2==0){
+                    hxq->command(0,1,cvargs); // quadra frequency
+                }else{
+                    hxa->command(0,1,cvargs); // acobuf frequency
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'i': // [quadra] gain
+        case 'D': // overdrive
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                cvargs[0]=ofMap(arg1,0,MEMLEN,0.,1.);
-                hxq->command(1,1,cvargs);
-            }
             pc=(pc+1)%MEMLEN;
-            break;
-        case 'p': // [quadra] note frequency: p <notenum>
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                cvargs[0]=idx2freq(arg1,roothx);
-                hxq->command(0,1,cvargs); // passing note frequency
-            }
-            pc=(pc+1)%MEMLEN;
-            break;
-        case 'D':
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            arg1=AB.find(M[pc]);
-            if(arg1!=-1){
-                cvargs[0]=ofMap(arg1,0,MEMLEN,1.,49.);
-                hxq->command(5,1,cvargs); // passing overdrive
+            arg2=AB.find(M[pc]);
+            if(arg1!=-1&&arg2!=-1){
+                cvargs[0]=ofMap(arg2,0,MEMLEN,1.,OVERDRIVE_LIMIT);
+                if(arg1%2==0){
+                    hxq->command(5,1,cvargs); // quadra
+                }else{
+                    hxa->command(5,1,cvargs); // acobuf
+                }
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -586,9 +637,9 @@ void ofApp::cyclevm(){
                 cvargs[0]=(float)arg2/(float)MEMLEN;
                 cvargs[1]=(float)arg3/(float)MEMLEN;
                 if(arg1%2==0){
-                    hxa->command(6,2,cvargs); // passing stereo kL, kR to acobuf
-                }else{
                     hxq->command(6,2,cvargs); // passing stereo kL, kR to quadra
+                }else{
+                    hxa->command(6,2,cvargs); // passing stereo kL, kR to acobuf
                 }
             }
             pc=(pc+1)%MEMLEN;
