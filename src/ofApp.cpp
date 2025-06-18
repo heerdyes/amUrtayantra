@@ -2,12 +2,12 @@
 
 void ofApp::setupsndsys(){
     ofSoundStreamSettings settings;
-	settings.numOutputChannels = NOUTCH;
-	settings.sampleRate = SMPLRATE;
-	settings.bufferSize = BUFSZ;
-	settings.numBuffers = NBUF;
-	settings.setOutListener(this);
-	soundStream.setup(settings);
+    settings.numOutputChannels = NOUTCH;
+    settings.sampleRate = SMPLRATE;
+    settings.bufferSize = BUFSZ;
+    settings.numBuffers = NBUF;
+    settings.setOutListener(this);
+    soundStream.setup(settings);
 }
 
 void ofApp::initvm(){
@@ -623,9 +623,9 @@ void ofApp::initsynth(){
     roothx=52.;
     // lfo wavs
     lfo1[0] = new lfosyn(2, 10);
-	lfo2[0] = new lfosyn(2, 10);
+    lfo2[0] = new lfosyn(2, 10);
     lfo1[1] = new lfosqu(1, 10);
-	lfo2[1] = new lfosqu(1, 10);
+    lfo2[1] = new lfosqu(1, 10);
     lfo1typ = 0;
     lfo2typ = 0;
     // init lfo scopes
@@ -654,14 +654,15 @@ void ofApp::initsynth(){
 }
 
 void ofApp::initcam(){
-    camw=1280;
-    camh=720;
+    camw=CAMWIDTH;
+    camh=CAMHEIGHT;
+
     vdo.setVerbose(true);
     vdo.setup(camw,camh);
+
     plane.set(ofGetWidth(),ofGetHeight());
     plane.mapTexCoords(0,0,ofGetWidth(),ofGetHeight());
-    camfnt.load("OCRA",8);
-    asciiChars=string("    ,./:;`~'\"+=()[]%%{}**");
+
     t=0.0;
     dt=0.01;
 }
@@ -729,15 +730,15 @@ void ofApp::update(){
     // lock the buffer
     unique_lock<mutex> lock(audioMutex);
 
-	waveform.clear();
-	for(size_t i = 0; i < lastBuffer.getNumFrames(); i++) {
+    waveform.clear();
+    for(size_t i = 0; i < lastBuffer.getNumFrames(); i++) {
         // graphing
-		float sample = lastBuffer.getSample(i, 0);
-		float x = ofMap(i, 0, lastBuffer.getNumFrames(), 0, ofGetWidth());
-		float y = ofMap(sample, -1, 1, 0, ofGetHeight());
-		waveform.addVertex(x, y);
-	}
-	rms = lastBuffer.getRMSAmplitude();
+        float sample = lastBuffer.getSample(i, 0);
+        float x = ofMap(i, 0, lastBuffer.getNumFrames(), 0, ofGetWidth());
+        float y = ofMap(sample, -1, 1, 0, ofGetHeight());
+        waveform.addVertex(x, y);
+    }
+    rms = lastBuffer.getRMSAmplitude();
 
     // record lfo variation
     lfo1scope.push_back(lfo1[lfo1typ]->y);
@@ -804,38 +805,38 @@ void ofApp::xmod(){
 }
 
 void ofApp::audioOut(ofSoundBuffer &outBuffer) {
-	int sr = outBuffer.getSampleRate();
-	for(size_t i = 0; i < outBuffer.getNumFrames(); i++) {
-		// waveshaping
+    int sr = outBuffer.getSampleRate();
+    for(size_t i = 0; i < outBuffer.getNumFrames(); i++) {
+        // waveshaping
         float mix=0.;
         for(int i=0;i<NOSCS;i++){
             mix += gain[i] * w[i][wtyp[i]]->y;
         }
         mix += hxgain * hxs->buf[i]; // hx synth
-		float lmono=mgain*mix;
+        float lmono=mgain*mix;
         // guards
-		if(lmono>0.99){
+        if(lmono>0.99){
             lmono=mghi;
         }else if(lmono<-0.99){
             lmono=-mghi;
         }
-		// write out
-		outBuffer.getSample(i, 0) = lmono;
-		outBuffer.getSample(i, 1) = lmono;
+        // write out
+        outBuffer.getSample(i, 0) = lmono;
+        outBuffer.getSample(i, 1) = lmono;
         // modulation
         xmod();
-		// updation
+        // updation
         for(int i=0;i<NOSCS;i++){
             w[i][wtyp[i]]->update(sr);
         }
-		lfo1[lfo1typ]->update(sr);
+        lfo1[lfo1typ]->update(sr);
         lfo2[lfo2typ]->update(sr);
         // harmonic series update
         hxs->update(sr);
-	}
+    }
 
-	unique_lock<mutex> lock(audioMutex);
-	lastBuffer = outBuffer;
+    unique_lock<mutex> lock(audioMutex);
+    lastBuffer = outBuffer;
 }
 
 //--------------------------------------------------------------
@@ -1157,46 +1158,28 @@ void ofApp::keyReleased(int key){
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-
-}
+void ofApp::mouseMoved(int x, int y ){}
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-
-}
+void ofApp::mouseDragged(int x, int y, int button){}
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-
-}
+void ofApp::mousePressed(int x, int y, int button){}
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-
-}
+void ofApp::mouseReleased(int x, int y, int button){}
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
-
-}
+void ofApp::mouseEntered(int x, int y){}
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
-
-}
+void ofApp::mouseExited(int x, int y){}
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
-
-}
+void ofApp::windowResized(int w, int h){}
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-
-}
+void ofApp::gotMessage(ofMessage msg){}
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
-
-}
+void ofApp::dragEvent(ofDragInfo dragInfo){ }
