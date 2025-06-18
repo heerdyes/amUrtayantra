@@ -129,7 +129,7 @@ void ofApp::cyclevm(){
                 M[xpc]=AB[arg2-1];
             }
             break;
-        case '1': // oscillator tuning
+        case '1': // oscillator tuning: 1 <oscnum> <mapfreq>
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,3*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
@@ -176,7 +176,7 @@ void ofApp::cyclevm(){
             pc=(pc+1)%MEMLEN;
             pos=AB.find(M[pc]);
             if(pos!=-1){
-                f5times=pos; // invoking with 0 causes system hang :D
+                f5times=pos; // invoking with 0 causes system hang :oD
             }
             pc=(pc+1)%MEMLEN;
             break;
@@ -343,7 +343,7 @@ void ofApp::cyclevm(){
             }
             pc=(pc+1)%MEMLEN;
             break;
-        case 'm':
+        case 'm': // master gain
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
             pc=(pc+1)%MEMLEN;
             arg1=AB.find(M[pc]);
@@ -796,10 +796,6 @@ void ofApp::xmod(){
         }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
             modgain(modmat[mmi][mmj], lfo2[lfo2typ], w[mmj-13][wtyp[mmj-13]]); // L2 mod w[0-8]g
         }
-    }else if(mmi==2){
-        // noop
-    }else if(mmi==3){
-        // noop
     }
     mmctr=(mmctr+1)%(MMROWS*MMCOLS);
 }
@@ -922,8 +918,6 @@ void ofApp::rndrmodmat(float x,float y){
     // row desc
     fnt.drawString("L1 0",x,y+ch*2);
     fnt.drawString("L2 1",x,y+ch*3);
-    fnt.drawString("NOOP",x,y+ch*4);
-    fnt.drawString("NOOP",x,y+ch*5);
     ofDrawLine(x+cw*3,y+ch,x+cw*3,y+ch*5+5);
     // col desc
     for(int i=0;i<MMCOLS;i++){
@@ -1124,7 +1118,7 @@ void ofApp::keyPressed(int key){
         loadshader(key-97+10);
         return;
     }
-    if(key==114&&ladown){ // alt+r -> randomly constituted program
+    if(key==82&&ladown){ // alt+R -> randomly constituted program
         clrmodmat();
         for(int i=0;i<MEMLEN;i++){
             int idx=(int)ofRandom(0,1024);

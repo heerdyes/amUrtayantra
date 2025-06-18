@@ -7,6 +7,9 @@ make
 cp -vr glsl/gl2 bin/data
 cp -vr glsl/gl3 bin/data
 
+# deploy tape
+cp -vr zero.tpx bin/data
+
 # run
 cd bin
 ./amUrtayantra

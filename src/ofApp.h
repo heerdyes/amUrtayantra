@@ -657,9 +657,7 @@ class ofApp : public ofBaseApp{
             //                     |<---    w[0-8]f    --->|   |<---    w[0-8]g    --->|
             // L1f, L2f, L1g, L2g, 0, 1, 2, 3, 4, 5, 6, 7, 8   0, 1, 2, 3, 4, 5, 6, 7, 8
             {    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // L1, [0] [2] -> X
-            {    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // L2, [1] [3] -> X
-            {    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }, // notenmbr
-            {    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }  // notevelo
+            {    0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0 }  // L2, [1] [3] -> X
             //   0    1    2    3  4  5  6  7  8  9 10 11 12  13 14 15 16 17 18 19 20 21
         }; // this is bool because i can't fix buffer overflow error that comes with int lol
         int mmctr;
@@ -672,43 +670,21 @@ class ofApp : public ofBaseApp{
         // vm
         char M[MEMLEN];
         // programs (patches) [0-9]
-        // sooner or later these are going to go into a file ;-P
+        // sooner or later these are going to go into a file, but not today :-D
         string prgms[NPRGMS]={
-            "^q1qDc13iq0g0c19ccanopqoc1mcknfa`q3 c1x 39N 3aSmM..............................................",
-            "mHI0n[g0c73P[c5c10m11\\12y13Fvmcti#t4\\ c,l#t8y c=o#tcF c$r~2...................................",
-            "raZLPLc35I0mZ~3f4z806Azc 16cckqcnrntg0 c.a....................................................",
+            "PDIQ~3mZvScg1*S2Bc9e...........................................................................",
+            "m'i0.p1/^*cg4**d@c9e`00`12i1HvB*B9Hf7cuwcysA99*93oc\\ cB7+ok[c!(p0[cBH..........................",
+            "...............................................................................................",
 
-            "AZ[#2|%#6|H#a|T i00i10i20i30p0'p1$p2Gp3Sc2uc6xca,ce;nvg0 c&ic&lc&oc&rf4 mM...................c",
-            "mMp0Ii00`01raZIce4 x0d150arg0csocs7 i1r`14 x1e1617c...........................................",
-            "n,g0r020#17,p0,cbei0.m.`03i1p10s11rp1.cb.i20`24 c3-f8Vc7 x041570zc&EAh1.......................",
+            "...............................................................................................",
+            "...............................................................................................",
+            "...............................................................................................",
 
-            "x141i00mG`02i10`13630en,g0p0,cnsfa cp6 x051500Z cpep1, cn% /020cpC cE=`24 i2g x3f1............",
-            "600r x101 x0d1`04i0mmHi10i20nvg0 c;1/020cv.71nv `12i1zp1vc`* `22i2dp2BraZBcPL.................",
-            "^? i0omM p0[n[cdb `0>c1kf4 x0d150)z x10160_u i10`13p1[cd%e5a20g0 =C0F/020 cDM cO  x151........",
+            "...............................................................................................",
+            "...............................................................................................",
+            "...............................................................................................",
 
-            "g0/020c13/020c5ai00i10i20c1ic5lccop0tp1[p2%nt#=|[#)|% c=,c);c$]`03`13`23mmfb10p11p12p........c",
-            "n,g0mhf5B............................V85+,c)c1[A81p1)c!#c-$i10c!C/030c3IcKD`11c!Sb;...........",
-            "V87i70c24V00cb5g0cgap70c2lcgm`7xc2ufanx c/v...................................................",
-
-            "n&g0v2X5|4p36c5bc9ci30c5km5e3620 =u03 cvlf4`33 c5=r093 c%\\ x041555Z..........................2",
-            "A82%251c24`21c2bc6ci20c2km9p2xc2snx cyte6920g0 =]0\\ c-lf7rrtt12t cCFc2E.......................",
-            "n,g0j0mTc.5q,c1cf6k1839wI%C=^=ctre9620 =,03>t4C c`q<t6% c^pXt~\">E3I cIo>ta8 cQk<t83 cYl.......2",
-
-            "mMj0q,n,g0c75c93h26if6^j%jzicnpcrjvr%rm6cz. c;i `02i00 p0,c7( x0d156zte8820 =P09 cQ% x14163mz.",
-            " x041x151550s630hn,g0P,cimI0/020ckt cvrm,~1fa 10t11t12t13s14s15s16s17s18sA61cR] x2f1x2g1x2i1...",
-            "^\\p\\0c13e4520cc4i\\0c1hf2`\\3c1pcciAZp/p%0 cz. =b0;rdlf x0f1c$*5a0r..............................",
-
-            "j0mZk16g7g0ca1A91V66cg5cj6rgmgct7^4>y8L/L97 c/' c]8nz/z1z c$^qzc*Efae590 =N0a.................",
-            "nog0j0c35mMqoc1ck1y23^=>m4d/d91cqscuhVf0-z0y c;] c-i i00c3&`02f8 p0oc1J x04153 r x0e1i10c3:`14.",
-            "n)g0j0mZk336jq)c1eAe7c35w=fIj#k~]f6Aa2>.8f%f43 c[- c\\9Vg9<*f6%686 cCE cGb.....................z",
-
-            "k1360j0mJg0c 6qonochfJZf4Aaa>rdu%uf0 cvxcz4ea620 =`0a..........................................",
-            "k1364j0mJg0c 6q[n[chfJZf4Aa9>rdG%Gf4 cvxcz4ea620 =`0a i00`04p0[chE ca* x0d1553tVa5 cXS.........",
-            "n-g0mF B.vb>a5( ce\\w~~B~^B cpm BA....j0c3/k14(bq-c1)B9....`01i00c3Fp0-c1Lf8 x0d1585tx101606r...",
-
-            "n,g0j0k>>>>cn5q,c1fea620=m03f3wB>``^TX,~B c'vm\"J\"<,2> c$w<,4> cC7cC8cC9cCa....................2",
-            "nqg0j0kMOMMcn5qqc1fea620=m03f3ww&``^gX,~w c'vm\"J\"<,2& c$w<,4M cC7#C~OcK8#C3McR9#CnMcYa........2",
-            "nrg0j0kz#^&cn5qrc1fea620=m03f3w(W``^SX,~( c'vm\"J\"<,2W c$w<,4z cC7#C2#cK8#C4^cR9#C6&cYa........2"
+            "..............................................................................................."
         };
         // alfabet
         string AB="0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:\"{}_+|~";
@@ -722,7 +698,6 @@ class ofApp : public ofBaseApp{
             0x087,0x870,0x807, 0x096,0x960,0x906, 0x0a5,0xa50,0xa05
         };
 
-        // "mAI0n[g0c73P[c5c10m11\12y13Fvmcti#t4\ c,l#t8y c=o#tcF c$r~2..................................."
         //  0123456789abcdefghijklmnopqrstuvwxyz,./;'[]-=\` )!@#$%^&*(ABCDEFGHIJKLMNOPQRSTUVWXYZ<>?:"{}_+|~
 
         // key gestures
