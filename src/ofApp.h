@@ -603,10 +603,6 @@ class ofApp : public ofBaseApp{
 		void rndrkb(float y);
 		void audioOut(ofSoundBuffer &outBuffer);
 		float idx2freq(int note,float basefreq);
-		void kbsweep();
-		void setupmpd();
-		void setupyc();
-		void setupdm();
 		void setupsndsys();
 		void initvm();
 		void cyclevm();
@@ -671,14 +667,7 @@ class ofApp : public ofBaseApp{
 		float roothx;
 		hxsyn * hxs;
 		
-		// midi
-		u_char * kb;
-		off_t kblen;
-		const char * reface   = "yamaha.refaceyc.00";
-		const char * deepmind = "behringer.deepmind.12";
-		int kbfd;
-		int activenote;
-		int notevelo;
+		// no midi on this branch
 
 		// vm
 		char M[MEMLEN];

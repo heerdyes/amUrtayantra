@@ -1,39 +1,5 @@
 #include "ofApp.h"
 
-void ofApp::setupyc(){
-    kbfd=shm_open(reface, O_RDWR, 0644);
-    fprintf(stderr, "[shm][yc] fd: %d\n", kbfd);
-    if(kbfd>0){
-        struct stat sby;
-        fstat(kbfd,&sby);
-        kblen=sby.st_size;
-        kb=(u_char *)mmap(NULL, kblen, PROT_READ|PROT_WRITE, MAP_SHARED, kbfd, 0);
-        fprintf(stderr, "[shm] addr: %p [0..%lu]\n", kb, kblen-1);
-        if(kb){
-            cout<<"[yc] all in order.\n";
-        }else{
-            cout<<"[error] the end is here!\n";
-        }
-    }
-}
-
-void ofApp::setupdm(){
-    kbfd=shm_open(deepmind, O_RDWR, 0644);
-    fprintf(stderr, "[shm][dm] fd: %d\n", kbfd);
-    if(kbfd>0){
-        struct stat sby;
-        fstat(kbfd,&sby);
-        kblen=sby.st_size;
-        kb=(u_char *)mmap(NULL, kblen, PROT_READ|PROT_WRITE, MAP_SHARED, kbfd, 0);
-        fprintf(stderr, "[shm] addr: %p [0..%lu]\n", kb, kblen-1);
-        if(kb){
-            cout<<"[dm] all in order.\n";
-        }else{
-            cout<<"[error] the end is here!\n";
-        }
-    }
-}
-
 void ofApp::setupsndsys(){
     ofSoundStreamSettings settings;
 	settings.numOutputChannels = NOUTCH;
@@ -83,19 +49,6 @@ void ofApp::cyclevm(){
     switch(code){
         case '.':
             pc=0;
-            break;
-        case 'n':
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            M[pc]=AB[activenote];
-            pc=(pc+1)%MEMLEN;
-            break;
-        case 'g':
-            ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
-            pc=(pc+1)%MEMLEN;
-            r0=((float)notevelo / 128.) * (float)MEMLEN;
-            M[pc]=AB[floor(r0)];
-            pc=(pc+1)%MEMLEN;
             break;
         case '^': // ramp up wraparound
             ofSetColor(248,248,248); ofDrawRectangle(vmx+pc*cw,vmy-ch+5,2*cw-3,ch+5);
@@ -687,8 +640,6 @@ void ofApp::initsynth(){
     rootfhi=80.0;
     tunlo=-7.0;
     tunhi=7.0;
-    activenote=0;
-    notevelo=0;
     // osc gains
     gainhi=1.0/NOSCS;
     cout<<"[initsynth] per-osc gain limit = "<<gainhi<<endl;
@@ -763,9 +714,6 @@ void ofApp::setup(){
     ofSetVerticalSync(true);
     ofBackground(0,0,0);
 
-    // use only one kbd at a time!
-    setupyc();    // yamaha reface yc
-    //setupdm();    // behringer deepmind 12
     setupsndsys();
     initvm();
     initsynth();
@@ -848,33 +796,9 @@ void ofApp::xmod(){
             modgain(modmat[mmi][mmj], lfo2[lfo2typ], w[mmj-13][wtyp[mmj-13]]); // L2 mod w[0-8]g
         }
     }else if(mmi==2){
-        if(mmj==0){
-            lfo1[lfo1typ]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod L1f
-        }else if(mmj==1){
-            lfo2[lfo2typ]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod L2f
-        }else if(mmj==2){
-            lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? activenote : 0); // nn mod L1g
-        }else if(mmj==3){
-            lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? activenote : 0); // nn mod L2g
-        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
-            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? activenote : 0); // nn mod w[0-8]f
-        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
-            modgain(modmat[mmi][mmj], activenote, w[mmj-13][wtyp[mmj-13]]); // nn mod w[0-8]g
-        }
+        // noop
     }else if(mmi==3){
-        if(mmj==0){
-            lfo1[lfo1typ]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod L1f
-        }else if(mmj==1){
-            lfo2[lfo2typ]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod L2f
-        }else if(mmj==2){
-            lfo1[lfo1typ]->modulate(1, modmat[mmi][mmj] ? notevelo : 0); // nv mod L1g
-        }else if(mmj==3){
-            lfo2[lfo2typ]->modulate(1, modmat[mmi][mmj] ? notevelo : 0); // nv mod L2g
-        }else if(mmj>=4&&mmj<=12){ // w[0-8]->f
-            w[mmj-4][wtyp[mmj-4]]->modulate(0, modmat[mmi][mmj] ? notevelo : 0); // nv mod w[0-8]f
-        }else if(mmj>=13&&mmj<=21){ // w[0-8]->g
-            modgain(modmat[mmi][mmj], notevelo, w[mmj-13][wtyp[mmj-13]]); // nv mod w[0-8]g
-        }
+        // noop
     }
     mmctr=(mmctr+1)%(MMROWS*MMCOLS);
 }
@@ -916,7 +840,7 @@ void ofApp::audioOut(ofSoundBuffer &outBuffer) {
 
 //--------------------------------------------------------------
 void ofApp::exit(){
-    close(kbfd);
+    //
 }
 
 void ofApp::rndrmem(float y){
@@ -943,17 +867,6 @@ void ofApp::rndrmem(float y){
         ofSetColor(144,144,144);
         sprintf(q,"%c",AB[i]);
         fnt.drawString(q,x+i*cw,y+3+ch+12);
-    }
-}
-
-void ofApp::rndrkb(float y){
-    int d=0;
-    float w=20,h=200;
-    float x=(ofGetWidth()-w*(kblen-1))/2;
-    ofNoFill();
-    for(int i=0;i<kblen-1;i++,d++){
-        float v=ofMap(kb[i],0,127,0.,h);
-        ofDrawLine(x+d*w,y+h-v,x+(d+1)*w,y+h-v);
     }
 }
 
@@ -1008,8 +921,8 @@ void ofApp::rndrmodmat(float x,float y){
     // row desc
     fnt.drawString("L1 0",x,y+ch*2);
     fnt.drawString("L2 1",x,y+ch*3);
-    fnt.drawString("NN 2",x,y+ch*4);
-    fnt.drawString("NV 3",x,y+ch*5);
+    fnt.drawString("NOOP",x,y+ch*4);
+    fnt.drawString("NOOP",x,y+ch*5);
     ofDrawLine(x+cw*3,y+ch,x+cw*3,y+ch*5+5);
     // col desc
     for(int i=0;i<MMCOLS;i++){
@@ -1032,21 +945,6 @@ void ofApp::rndrmodmat(float x,float y){
     ofDrawLine(x+cw*3,y+ch+3,x+cw*(5+(MMCOLS-1)*2),y+ch+3);
 }
 
-void ofApp::kbsweep(){
-    int somenoteon=0;
-    for(int i=0;i<kblen;i++){
-        if(kb[i]>0){
-            activenote=i;
-            notevelo=kb[i];
-            somenoteon=1;
-            break;
-        }
-    }
-    if(!somenoteon){
-        notevelo=0;
-    }
-}
-
 void ofApp::trtlwalk(){
     for(int i=0;i<NOSCS;i++){
         tx[i]->rndr();
@@ -1062,10 +960,7 @@ void ofApp::f5(float x,float y,int times,ofPixelsRef & pixelsRef){
     rndrcam(pixelsRef);
     for(int i=0;i<times;i++){
         ofSetColor(0,240,0);
-        // monophonic key sweeping
-        kbsweep();
         // rndr
-        rndrkb(ofGetHeight()-200-30);
         rndrmem(y);
         rndrmodmat(112,170);
         rndrlfos(ofGetWidth()*0.66,144);
