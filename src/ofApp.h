@@ -1,9 +1,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #define MEMLEN 95
 #define NHUES 33
